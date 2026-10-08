@@ -1,0 +1,245 @@
+/* ============================================================
+   PMM_VIPCore - VIP panel colours (pmm_vip_theme.css)
+   Generated from the "Paint.Theme" section of PMM_VIPCore.json.
+   Plugin writes it next to PMM_VIPCore.dll on load and on "css_pmm_vip css".
+   Copy it to panorama/styles/custom_game/ of the addon and rebuild the addon.
+   ============================================================ */
+
+/* ---------- panel ---------- */
+.vip-root { background-color: gradient( linear, 0% 0%, 0% 100%, from( #19171cf5 ), to( #0d0c10f5 ) ); border: 1px solid #3a2f1c; }
+.vip-sep { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #ffffff1a ), to( #ffffff00 ) ); }
+.vip-nick { color: #ffffff; }
+.vip-exp-pre, .vip-exp-left { color: #a7a29a; }
+.vip-clock { wash-color: #a7a29a; }
+.vip-x { background-color: #ffffff0d; }
+.vip-x:hover { background-color: #c93642; }
+.vip-x-t { color: #ffffffcc; }
+
+/* ---------- tiles / chips / rows ---------- */
+.vt, .vp, .vl { background-color: #ffffff08; border: 1px solid #ffffff12; }
+.vt:hover, .vp:hover, .vl:hover { background-color: #ffffff12; }
+.vt-name, .vp-t, .vl-t, .vip-sub-title { color: #ece8e0; }
+.vt-desc, .vip-sub-hint { color: #8e897f; }
+.vl-chev { wash-color: #8e897f; }
+.vt-icbox { background-color: #ffffff0d; }
+.vt-ic { wash-color: #d8d4cc; }
+
+/* ---------- switch ---------- */
+.vt-sw { background-color: #ffffff1f; }
+.vt-knob { background-color: #9a958c; }
+.vt.on .vt-knob { background-color: #ffffff; }
+
+/* ---------- footer ---------- */
+.vip-back, .vip-pb { background-color: #ffffff0f; }
+.vip-back:hover, .vip-pb:hover { background-color: #ffffff22; }
+.vip-back-t, .vip-page { color: #dddddd; }
+.vip-pb-ic { wash-color: #dddddd; }
+.vip-dot { background-color: #ffffff26; }
+.vip-toast { background-color: #1f2a1b; border: 1px solid #6fbf5a66; }
+.vip-toast-t { color: #d6efcd; }
+.vip-toast-ic { wash-color: #8fe07a; }
+.vip-root.toast-warn .vip-toast { background-color: #2a1b1b; border: 1px solid #d9606066; }
+.vip-root.toast-warn .vip-toast-t { color: #f3d0d0; }
+.vip-root.toast-warn .vip-toast-ic { wash-color: #ff8a8a; }
+
+/* ---------- group palettes (grp-*) ---------- */
+/* gold */
+.vip-root.grp-gold .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #f2c35b00 ), color-stop( 0.3, #f2c35b ), color-stop( 0.5, #ffe39a ), color-stop( 0.7, #f2c35b ), to( #f2c35b00 ) ); }
+.vip-root.grp-gold .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #f2c35b14 ), to( #f2c35b00 ) ); }
+.vip-root.grp-gold .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #ffe39a ), color-stop( 0.6, #f2c35b ), to( #a8701a ) ); box-shadow: #f2c35b55 0px 0px 18px 0px; }
+.vip-root.grp-gold .vip-badge-t { color: #24190a; }
+.vip-root.grp-gold .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #f2c35b ), to( #a8701a ) ); }
+.vip-root.grp-gold .vip-group-t { color: #24190a; }
+.vip-root.grp-gold .vip-exp-date { color: #f2c35b; }
+.vip-root.grp-gold .vip-sub-icbox { background-color: #f2c35b26; }
+.vip-root.grp-gold .vip-sub-icbox .vt-ic { wash-color: #f2c35b; }
+.vip-root.grp-gold .vt:hover { border: 1px solid #f2c35b99; }
+.vip-root.grp-gold .vt.on .vt-icbox { background-color: #f2c35b26; }
+.vip-root.grp-gold .vt.on .vt-ic { wash-color: #f2c35b; }
+.vip-root.grp-gold .vt.on .vt-desc { color: #ffe39abb; }
+.vip-root.grp-gold .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #a8701a ), to( #f2c35b ) ); box-shadow: #f2c35b66 0px 0px 10px 0px; }
+.vip-root.grp-gold .vt-chip { border: 1px solid #f2c35b88; }
+.vip-root.grp-gold .vt-chip-t { color: #f2c35b; }
+.vip-root.grp-gold .vt-chev { wash-color: #f2c35b; }
+.vip-root.grp-gold .vt-act { background-color: #f2c35b1f; }
+.vip-root.grp-gold .vt-act-t { color: #f2c35b; }
+.vip-root.grp-gold .vp:hover { border: 1px solid #f2c35b99; }
+.vip-root.grp-gold .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #f2c35b33 ), to( #f2c35b14 ) ); border: 1px solid #f2c35b; box-shadow: #f2c35b40 0px 0px 12px 0px; }
+.vip-root.grp-gold .vp.sel .vp-t { color: #ffe39a; }
+.vip-root.grp-gold .vl:hover { border: 1px solid #f2c35b99; }
+.vip-root.grp-gold .vip-dot.a { background-color: #f2c35b; }
+/* silver */
+.vip-root.grp-silver .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9d2dc00 ), color-stop( 0.3, #c9d2dc ), color-stop( 0.5, #f2f6fa ), color-stop( 0.7, #c9d2dc ), to( #c9d2dc00 ) ); }
+.vip-root.grp-silver .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9d2dc14 ), to( #c9d2dc00 ) ); }
+.vip-root.grp-silver .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #f2f6fa ), color-stop( 0.6, #c9d2dc ), to( #7d8894 ) ); box-shadow: #c9d2dc55 0px 0px 18px 0px; }
+.vip-root.grp-silver .vip-badge-t { color: #1b2026; }
+.vip-root.grp-silver .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9d2dc ), to( #7d8894 ) ); }
+.vip-root.grp-silver .vip-group-t { color: #1b2026; }
+.vip-root.grp-silver .vip-exp-date { color: #c9d2dc; }
+.vip-root.grp-silver .vip-sub-icbox { background-color: #c9d2dc26; }
+.vip-root.grp-silver .vip-sub-icbox .vt-ic { wash-color: #c9d2dc; }
+.vip-root.grp-silver .vt:hover { border: 1px solid #c9d2dc99; }
+.vip-root.grp-silver .vt.on .vt-icbox { background-color: #c9d2dc26; }
+.vip-root.grp-silver .vt.on .vt-ic { wash-color: #c9d2dc; }
+.vip-root.grp-silver .vt.on .vt-desc { color: #f2f6fabb; }
+.vip-root.grp-silver .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d8894 ), to( #c9d2dc ) ); box-shadow: #c9d2dc66 0px 0px 10px 0px; }
+.vip-root.grp-silver .vt-chip { border: 1px solid #c9d2dc88; }
+.vip-root.grp-silver .vt-chip-t { color: #c9d2dc; }
+.vip-root.grp-silver .vt-chev { wash-color: #c9d2dc; }
+.vip-root.grp-silver .vt-act { background-color: #c9d2dc1f; }
+.vip-root.grp-silver .vt-act-t { color: #c9d2dc; }
+.vip-root.grp-silver .vp:hover { border: 1px solid #c9d2dc99; }
+.vip-root.grp-silver .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #c9d2dc33 ), to( #c9d2dc14 ) ); border: 1px solid #c9d2dc; box-shadow: #c9d2dc40 0px 0px 12px 0px; }
+.vip-root.grp-silver .vp.sel .vp-t { color: #f2f6fa; }
+.vip-root.grp-silver .vl:hover { border: 1px solid #c9d2dc99; }
+.vip-root.grp-silver .vip-dot.a { background-color: #c9d2dc; }
+/* bronze */
+.vip-root.grp-bronze .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #d8915a00 ), color-stop( 0.3, #d8915a ), color-stop( 0.5, #f3c39b ), color-stop( 0.7, #d8915a ), to( #d8915a00 ) ); }
+.vip-root.grp-bronze .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #d8915a14 ), to( #d8915a00 ) ); }
+.vip-root.grp-bronze .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #f3c39b ), color-stop( 0.6, #d8915a ), to( #8a4f22 ) ); box-shadow: #d8915a55 0px 0px 18px 0px; }
+.vip-root.grp-bronze .vip-badge-t { color: #26150a; }
+.vip-root.grp-bronze .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #d8915a ), to( #8a4f22 ) ); }
+.vip-root.grp-bronze .vip-group-t { color: #26150a; }
+.vip-root.grp-bronze .vip-exp-date { color: #d8915a; }
+.vip-root.grp-bronze .vip-sub-icbox { background-color: #d8915a26; }
+.vip-root.grp-bronze .vip-sub-icbox .vt-ic { wash-color: #d8915a; }
+.vip-root.grp-bronze .vt:hover { border: 1px solid #d8915a99; }
+.vip-root.grp-bronze .vt.on .vt-icbox { background-color: #d8915a26; }
+.vip-root.grp-bronze .vt.on .vt-ic { wash-color: #d8915a; }
+.vip-root.grp-bronze .vt.on .vt-desc { color: #f3c39bbb; }
+.vip-root.grp-bronze .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8a4f22 ), to( #d8915a ) ); box-shadow: #d8915a66 0px 0px 10px 0px; }
+.vip-root.grp-bronze .vt-chip { border: 1px solid #d8915a88; }
+.vip-root.grp-bronze .vt-chip-t { color: #d8915a; }
+.vip-root.grp-bronze .vt-chev { wash-color: #d8915a; }
+.vip-root.grp-bronze .vt-act { background-color: #d8915a1f; }
+.vip-root.grp-bronze .vt-act-t { color: #d8915a; }
+.vip-root.grp-bronze .vp:hover { border: 1px solid #d8915a99; }
+.vip-root.grp-bronze .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #d8915a33 ), to( #d8915a14 ) ); border: 1px solid #d8915a; box-shadow: #d8915a40 0px 0px 12px 0px; }
+.vip-root.grp-bronze .vp.sel .vp-t { color: #f3c39b; }
+.vip-root.grp-bronze .vl:hover { border: 1px solid #d8915a99; }
+.vip-root.grp-bronze .vip-dot.a { background-color: #d8915a; }
+/* platinum */
+.vip-root.grp-platinum .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9fe3e000 ), color-stop( 0.3, #9fe3e0 ), color-stop( 0.5, #e2fbfa ), color-stop( 0.7, #9fe3e0 ), to( #9fe3e000 ) ); }
+.vip-root.grp-platinum .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9fe3e014 ), to( #9fe3e000 ) ); }
+.vip-root.grp-platinum .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #e2fbfa ), color-stop( 0.6, #9fe3e0 ), to( #4f9a97 ) ); box-shadow: #9fe3e055 0px 0px 18px 0px; }
+.vip-root.grp-platinum .vip-badge-t { color: #0f2423; }
+.vip-root.grp-platinum .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9fe3e0 ), to( #4f9a97 ) ); }
+.vip-root.grp-platinum .vip-group-t { color: #0f2423; }
+.vip-root.grp-platinum .vip-exp-date { color: #9fe3e0; }
+.vip-root.grp-platinum .vip-sub-icbox { background-color: #9fe3e026; }
+.vip-root.grp-platinum .vip-sub-icbox .vt-ic { wash-color: #9fe3e0; }
+.vip-root.grp-platinum .vt:hover { border: 1px solid #9fe3e099; }
+.vip-root.grp-platinum .vt.on .vt-icbox { background-color: #9fe3e026; }
+.vip-root.grp-platinum .vt.on .vt-ic { wash-color: #9fe3e0; }
+.vip-root.grp-platinum .vt.on .vt-desc { color: #e2fbfabb; }
+.vip-root.grp-platinum .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #4f9a97 ), to( #9fe3e0 ) ); box-shadow: #9fe3e066 0px 0px 10px 0px; }
+.vip-root.grp-platinum .vt-chip { border: 1px solid #9fe3e088; }
+.vip-root.grp-platinum .vt-chip-t { color: #9fe3e0; }
+.vip-root.grp-platinum .vt-chev { wash-color: #9fe3e0; }
+.vip-root.grp-platinum .vt-act { background-color: #9fe3e01f; }
+.vip-root.grp-platinum .vt-act-t { color: #9fe3e0; }
+.vip-root.grp-platinum .vp:hover { border: 1px solid #9fe3e099; }
+.vip-root.grp-platinum .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #9fe3e033 ), to( #9fe3e014 ) ); border: 1px solid #9fe3e0; box-shadow: #9fe3e040 0px 0px 12px 0px; }
+.vip-root.grp-platinum .vp.sel .vp-t { color: #e2fbfa; }
+.vip-root.grp-platinum .vl:hover { border: 1px solid #9fe3e099; }
+.vip-root.grp-platinum .vip-dot.a { background-color: #9fe3e0; }
+/* emerald */
+.vip-root.grp-emerald .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5fd38d00 ), color-stop( 0.3, #5fd38d ), color-stop( 0.5, #b7f5cf ), color-stop( 0.7, #5fd38d ), to( #5fd38d00 ) ); }
+.vip-root.grp-emerald .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5fd38d14 ), to( #5fd38d00 ) ); }
+.vip-root.grp-emerald .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #b7f5cf ), color-stop( 0.6, #5fd38d ), to( #24804a ) ); box-shadow: #5fd38d55 0px 0px 18px 0px; }
+.vip-root.grp-emerald .vip-badge-t { color: #0b2415; }
+.vip-root.grp-emerald .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5fd38d ), to( #24804a ) ); }
+.vip-root.grp-emerald .vip-group-t { color: #0b2415; }
+.vip-root.grp-emerald .vip-exp-date { color: #5fd38d; }
+.vip-root.grp-emerald .vip-sub-icbox { background-color: #5fd38d26; }
+.vip-root.grp-emerald .vip-sub-icbox .vt-ic { wash-color: #5fd38d; }
+.vip-root.grp-emerald .vt:hover { border: 1px solid #5fd38d99; }
+.vip-root.grp-emerald .vt.on .vt-icbox { background-color: #5fd38d26; }
+.vip-root.grp-emerald .vt.on .vt-ic { wash-color: #5fd38d; }
+.vip-root.grp-emerald .vt.on .vt-desc { color: #b7f5cfbb; }
+.vip-root.grp-emerald .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #24804a ), to( #5fd38d ) ); box-shadow: #5fd38d66 0px 0px 10px 0px; }
+.vip-root.grp-emerald .vt-chip { border: 1px solid #5fd38d88; }
+.vip-root.grp-emerald .vt-chip-t { color: #5fd38d; }
+.vip-root.grp-emerald .vt-chev { wash-color: #5fd38d; }
+.vip-root.grp-emerald .vt-act { background-color: #5fd38d1f; }
+.vip-root.grp-emerald .vt-act-t { color: #5fd38d; }
+.vip-root.grp-emerald .vp:hover { border: 1px solid #5fd38d99; }
+.vip-root.grp-emerald .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #5fd38d33 ), to( #5fd38d14 ) ); border: 1px solid #5fd38d; box-shadow: #5fd38d40 0px 0px 12px 0px; }
+.vip-root.grp-emerald .vp.sel .vp-t { color: #b7f5cf; }
+.vip-root.grp-emerald .vl:hover { border: 1px solid #5fd38d99; }
+.vip-root.grp-emerald .vip-dot.a { background-color: #5fd38d; }
+/* ruby */
+.vip-root.grp-ruby .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ef5a6f00 ), color-stop( 0.3, #ef5a6f ), color-stop( 0.5, #ffb0bb ), color-stop( 0.7, #ef5a6f ), to( #ef5a6f00 ) ); }
+.vip-root.grp-ruby .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ef5a6f14 ), to( #ef5a6f00 ) ); }
+.vip-root.grp-ruby .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #ffb0bb ), color-stop( 0.6, #ef5a6f ), to( #9a2133 ) ); box-shadow: #ef5a6f55 0px 0px 18px 0px; }
+.vip-root.grp-ruby .vip-badge-t { color: #2a0a10; }
+.vip-root.grp-ruby .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ef5a6f ), to( #9a2133 ) ); }
+.vip-root.grp-ruby .vip-group-t { color: #2a0a10; }
+.vip-root.grp-ruby .vip-exp-date { color: #ef5a6f; }
+.vip-root.grp-ruby .vip-sub-icbox { background-color: #ef5a6f26; }
+.vip-root.grp-ruby .vip-sub-icbox .vt-ic { wash-color: #ef5a6f; }
+.vip-root.grp-ruby .vt:hover { border: 1px solid #ef5a6f99; }
+.vip-root.grp-ruby .vt.on .vt-icbox { background-color: #ef5a6f26; }
+.vip-root.grp-ruby .vt.on .vt-ic { wash-color: #ef5a6f; }
+.vip-root.grp-ruby .vt.on .vt-desc { color: #ffb0bbbb; }
+.vip-root.grp-ruby .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9a2133 ), to( #ef5a6f ) ); box-shadow: #ef5a6f66 0px 0px 10px 0px; }
+.vip-root.grp-ruby .vt-chip { border: 1px solid #ef5a6f88; }
+.vip-root.grp-ruby .vt-chip-t { color: #ef5a6f; }
+.vip-root.grp-ruby .vt-chev { wash-color: #ef5a6f; }
+.vip-root.grp-ruby .vt-act { background-color: #ef5a6f1f; }
+.vip-root.grp-ruby .vt-act-t { color: #ef5a6f; }
+.vip-root.grp-ruby .vp:hover { border: 1px solid #ef5a6f99; }
+.vip-root.grp-ruby .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #ef5a6f33 ), to( #ef5a6f14 ) ); border: 1px solid #ef5a6f; box-shadow: #ef5a6f40 0px 0px 12px 0px; }
+.vip-root.grp-ruby .vp.sel .vp-t { color: #ffb0bb; }
+.vip-root.grp-ruby .vl:hover { border: 1px solid #ef5a6f99; }
+.vip-root.grp-ruby .vip-dot.a { background-color: #ef5a6f; }
+/* sapphire */
+.vip-root.grp-sapphire .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5f9cf200 ), color-stop( 0.3, #5f9cf2 ), color-stop( 0.5, #b9d6ff ), color-stop( 0.7, #5f9cf2 ), to( #5f9cf200 ) ); }
+.vip-root.grp-sapphire .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5f9cf214 ), to( #5f9cf200 ) ); }
+.vip-root.grp-sapphire .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #b9d6ff ), color-stop( 0.6, #5f9cf2 ), to( #2a5aa8 ) ); box-shadow: #5f9cf255 0px 0px 18px 0px; }
+.vip-root.grp-sapphire .vip-badge-t { color: #0b1830; }
+.vip-root.grp-sapphire .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5f9cf2 ), to( #2a5aa8 ) ); }
+.vip-root.grp-sapphire .vip-group-t { color: #0b1830; }
+.vip-root.grp-sapphire .vip-exp-date { color: #5f9cf2; }
+.vip-root.grp-sapphire .vip-sub-icbox { background-color: #5f9cf226; }
+.vip-root.grp-sapphire .vip-sub-icbox .vt-ic { wash-color: #5f9cf2; }
+.vip-root.grp-sapphire .vt:hover { border: 1px solid #5f9cf299; }
+.vip-root.grp-sapphire .vt.on .vt-icbox { background-color: #5f9cf226; }
+.vip-root.grp-sapphire .vt.on .vt-ic { wash-color: #5f9cf2; }
+.vip-root.grp-sapphire .vt.on .vt-desc { color: #b9d6ffbb; }
+.vip-root.grp-sapphire .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2a5aa8 ), to( #5f9cf2 ) ); box-shadow: #5f9cf266 0px 0px 10px 0px; }
+.vip-root.grp-sapphire .vt-chip { border: 1px solid #5f9cf288; }
+.vip-root.grp-sapphire .vt-chip-t { color: #5f9cf2; }
+.vip-root.grp-sapphire .vt-chev { wash-color: #5f9cf2; }
+.vip-root.grp-sapphire .vt-act { background-color: #5f9cf21f; }
+.vip-root.grp-sapphire .vt-act-t { color: #5f9cf2; }
+.vip-root.grp-sapphire .vp:hover { border: 1px solid #5f9cf299; }
+.vip-root.grp-sapphire .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #5f9cf233 ), to( #5f9cf214 ) ); border: 1px solid #5f9cf2; box-shadow: #5f9cf240 0px 0px 12px 0px; }
+.vip-root.grp-sapphire .vp.sel .vp-t { color: #b9d6ff; }
+.vip-root.grp-sapphire .vl:hover { border: 1px solid #5f9cf299; }
+.vip-root.grp-sapphire .vip-dot.a { background-color: #5f9cf2; }
+/* amethyst */
+.vip-root.grp-amethyst .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #b07cf200 ), color-stop( 0.3, #b07cf2 ), color-stop( 0.5, #ddc4ff ), color-stop( 0.7, #b07cf2 ), to( #b07cf200 ) ); }
+.vip-root.grp-amethyst .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #b07cf214 ), to( #b07cf200 ) ); }
+.vip-root.grp-amethyst .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( #ddc4ff ), color-stop( 0.6, #b07cf2 ), to( #6a3bb0 ) ); box-shadow: #b07cf255 0px 0px 18px 0px; }
+.vip-root.grp-amethyst .vip-badge-t { color: #1d0f30; }
+.vip-root.grp-amethyst .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( #b07cf2 ), to( #6a3bb0 ) ); }
+.vip-root.grp-amethyst .vip-group-t { color: #1d0f30; }
+.vip-root.grp-amethyst .vip-exp-date { color: #b07cf2; }
+.vip-root.grp-amethyst .vip-sub-icbox { background-color: #b07cf226; }
+.vip-root.grp-amethyst .vip-sub-icbox .vt-ic { wash-color: #b07cf2; }
+.vip-root.grp-amethyst .vt:hover { border: 1px solid #b07cf299; }
+.vip-root.grp-amethyst .vt.on .vt-icbox { background-color: #b07cf226; }
+.vip-root.grp-amethyst .vt.on .vt-ic { wash-color: #b07cf2; }
+.vip-root.grp-amethyst .vt.on .vt-desc { color: #ddc4ffbb; }
+.vip-root.grp-amethyst .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #6a3bb0 ), to( #b07cf2 ) ); box-shadow: #b07cf266 0px 0px 10px 0px; }
+.vip-root.grp-amethyst .vt-chip { border: 1px solid #b07cf288; }
+.vip-root.grp-amethyst .vt-chip-t { color: #b07cf2; }
+.vip-root.grp-amethyst .vt-chev { wash-color: #b07cf2; }
+.vip-root.grp-amethyst .vt-act { background-color: #b07cf21f; }
+.vip-root.grp-amethyst .vt-act-t { color: #b07cf2; }
+.vip-root.grp-amethyst .vp:hover { border: 1px solid #b07cf299; }
+.vip-root.grp-amethyst .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( #b07cf233 ), to( #b07cf214 ) ); border: 1px solid #b07cf2; box-shadow: #b07cf240 0px 0px 12px 0px; }
+.vip-root.grp-amethyst .vp.sel .vp-t { color: #ddc4ff; }
+.vip-root.grp-amethyst .vl:hover { border: 1px solid #b07cf299; }
+.vip-root.grp-amethyst .vip-dot.a { background-color: #b07cf2; }

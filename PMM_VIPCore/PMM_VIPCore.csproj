@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>PMM_VIPCore</AssemblyName>
+        <RootNamespace>PMM_VIPCore</RootNamespace>
+        <Version>0.1.1</Version>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CounterStrikeSharp.API" Version="1.0.376">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <!-- MenuManagerApi.dll must live only in shared/MenuManagerApi -->
+        <ProjectReference Include="..\MenuManagerApi\MenuManagerApi.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+        <!-- Lib.Harmony 2.4.2 (net10.0), same build as PMM_GG1MapChooser / SwiftlyS2 -->
+        <!-- Not copied next to the plugin dll: it goes to harmony\ and is loaded into the default context -->
+        <Reference Include="0Harmony">
+            <HintPath>lib\0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <!-- No reference to VIPCore / VipCoreApi: everything goes through reflection,
+             so the bridge works with the original thesamefabius build without recompiling it. -->
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="theme.template.css" LogicalName="theme.template.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="lib\0Harmony.dll" Link="harmony\0Harmony.dll" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,71 @@
+/* ============================================================
+   PMM_VIPCore - VIP panel colours (pmm_vip_theme.css)
+   Generated from the "Paint.Theme" section of PMM_VIPCore.json.
+   Plugin writes it next to PMM_VIPCore.dll on load and on "css_pmm_vip css".
+   Copy it to panorama/styles/custom_game/ of the addon and rebuild the addon.
+   ============================================================ */
+
+/* ---------- panel ---------- */
+.vip-root { background-color: gradient( linear, 0% 0%, 0% 100%, from( {{PanelTop}} ), to( {{PanelBottom}} ) ); border: 1px solid {{PanelBorder}}; }
+.vip-sep { background-color: gradient( linear, 0% 0%, 100% 0%, from( {{Separator.rgb}}00 ), color-stop( 0.5, {{Separator}} ), to( {{Separator.rgb}}00 ) ); }
+.vip-nick { color: {{Nick}}; }
+.vip-exp-pre, .vip-exp-left { color: {{Muted}}; }
+.vip-clock { wash-color: {{Muted}}; }
+.vip-x { background-color: {{CloseBg}}; }
+.vip-x:hover { background-color: {{CloseHover}}; }
+.vip-x-t { color: {{CloseText}}; }
+
+/* ---------- tiles / chips / rows ---------- */
+.vt, .vp, .vl { background-color: {{TileBg}}; border: 1px solid {{TileBorder}}; }
+.vt:hover, .vp:hover, .vl:hover { background-color: {{TileHover}}; }
+.vt-name, .vp-t, .vl-t, .vip-sub-title { color: {{TileName}}; }
+.vt-desc, .vip-sub-hint { color: {{TileDesc}}; }
+.vl-chev { wash-color: {{TileDesc}}; }
+.vt-icbox { background-color: {{IconBox}}; }
+.vt-ic { wash-color: {{Icon}}; }
+
+/* ---------- switch ---------- */
+.vt-sw { background-color: {{SwitchOff}}; }
+.vt-knob { background-color: {{KnobOff}}; }
+.vt.on .vt-knob { background-color: {{KnobOn}}; }
+
+/* ---------- footer ---------- */
+.vip-back, .vip-pb { background-color: {{ButtonBg}}; }
+.vip-back:hover, .vip-pb:hover { background-color: {{ButtonHover}}; }
+.vip-back-t, .vip-page { color: {{ButtonText}}; }
+.vip-pb-ic { wash-color: {{ButtonText}}; }
+.vip-dot { background-color: {{DotOff}}; }
+.vip-toast { background-color: {{ToastOkBg}}; border: 1px solid {{ToastOkBorder}}; }
+.vip-toast-t { color: {{ToastOkText}}; }
+.vip-toast-ic { wash-color: {{ToastOkIcon}}; }
+.vip-root.toast-warn .vip-toast { background-color: {{ToastWarnBg}}; border: 1px solid {{ToastWarnBorder}}; }
+.vip-root.toast-warn .vip-toast-t { color: {{ToastWarnText}}; }
+.vip-root.toast-warn .vip-toast-ic { wash-color: {{ToastWarnIcon}}; }
+
+/* ---------- group palettes (grp-*) ---------- */
+/*@@palette@@*/
+/* {{name}} */
+.vip-root.grp-{{name}} .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( {{a}}00 ), color-stop( 0.3, {{a}} ), color-stop( 0.5, {{l}} ), color-stop( 0.7, {{a}} ), to( {{a}}00 ) ); }
+.vip-root.grp-{{name}} .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( {{a}}14 ), to( {{a}}00 ) ); }
+.vip-root.grp-{{name}} .vip-badge { background-color: gradient( linear, 0% 0%, 100% 100%, from( {{l}} ), color-stop( 0.6, {{a}} ), to( {{d}} ) ); box-shadow: {{a}}55 0px 0px 18px 0px; }
+.vip-root.grp-{{name}} .vip-badge-t { color: {{on}}; }
+.vip-root.grp-{{name}} .vip-group { background-color: gradient( linear, 0% 0%, 100% 0%, from( {{a}} ), to( {{d}} ) ); }
+.vip-root.grp-{{name}} .vip-group-t { color: {{on}}; }
+.vip-root.grp-{{name}} .vip-exp-date { color: {{a}}; }
+.vip-root.grp-{{name}} .vip-sub-icbox { background-color: {{a}}26; }
+.vip-root.grp-{{name}} .vip-sub-icbox .vt-ic { wash-color: {{a}}; }
+.vip-root.grp-{{name}} .vt:hover { border: 1px solid {{a}}99; }
+.vip-root.grp-{{name}} .vt.on .vt-icbox { background-color: {{a}}26; }
+.vip-root.grp-{{name}} .vt.on .vt-ic { wash-color: {{a}}; }
+.vip-root.grp-{{name}} .vt.on .vt-desc { color: {{l}}bb; }
+.vip-root.grp-{{name}} .vt.on .vt-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( {{d}} ), to( {{a}} ) ); box-shadow: {{a}}66 0px 0px 10px 0px; }
+.vip-root.grp-{{name}} .vt-chip { border: 1px solid {{a}}88; }
+.vip-root.grp-{{name}} .vt-chip-t { color: {{a}}; }
+.vip-root.grp-{{name}} .vt-chev { wash-color: {{a}}; }
+.vip-root.grp-{{name}} .vt-act { background-color: {{a}}1f; }
+.vip-root.grp-{{name}} .vt-act-t { color: {{a}}; }
+.vip-root.grp-{{name}} .vp:hover { border: 1px solid {{a}}99; }
+.vip-root.grp-{{name}} .vp.sel { background-color: gradient( linear, 0% 0%, 100% 100%, from( {{a}}33 ), to( {{a}}14 ) ); border: 1px solid {{a}}; box-shadow: {{a}}40 0px 0px 12px 0px; }
+.vip-root.grp-{{name}} .vp.sel .vp-t { color: {{l}}; }
+.vip-root.grp-{{name}} .vl:hover { border: 1px solid {{a}}99; }
+.vip-root.grp-{{name}} .vip-dot.a { background-color: {{a}}; }

@@ -1,0 +1,134 @@
+{
+  "Enabled": true,
+  "ForceMenuType": "",
+  "InterceptPlugins": [
+    "VIPCore",
+    "VIP_*"
+  ],
+  "MainToggles": true,
+  "ToggleNotify": true,
+  "InlineSelectFeatures": [
+    "Fov",
+    "Tag"
+  ],
+  "InlineSelectMax": 16,
+  "BackButton": true,
+  "ReturnToParentAfterSelect": true,
+  "ExitButton": true,
+  "StripColors": true,
+  "Debug": false,
+  "Paint": {
+    "Enabled": true,
+    "LayoutPath": "panorama/layout/custom_game/pmm_vip.xml",
+    "Position": "Center",
+    "OpenDelay": 0.2,
+    "InputDelay": 0.2,
+    "ToastSeconds": 2.5,
+    "DateFormat": "dd.MM.yyyy",
+    "GroupPalette": {
+      "VIPBRONZE": "bronze",
+      "VIPSILVER": "silver",
+      "VIPGOLD": "gold"
+    },
+    "DefaultPalette": "gold",
+    "DefaultIcon": "star",
+    "Texts": {
+      "Brand": "VIP",
+      "Forever": "навсегда",
+      "Until": "до",
+      "DaysLeft": "· {0} дн.",
+      "Enabled": "Включено",
+      "Disabled": "Выключено",
+      "NoAccess": "Нет доступа",
+      "Use": "▶ ИСП.",
+      "Back": "‹ НАЗАД",
+      "PickHint": "Выбери значение",
+      "ListHint": "",
+      "Page": "{0} / {1}"
+    },
+    "Theme": {
+      "PanelTop": "#19171cf5",
+      "PanelBottom": "#0d0c10f5",
+      "PanelBorder": "#3a2f1c",
+      "Separator": "#ffffff1a",
+      "Nick": "#ffffff",
+      "Muted": "#a7a29a",
+      "CloseBg": "#ffffff0d",
+      "CloseHover": "#c93642",
+      "CloseText": "#ffffffcc",
+      "TileBg": "#ffffff08",
+      "TileBorder": "#ffffff12",
+      "TileHover": "#ffffff12",
+      "TileName": "#ece8e0",
+      "TileDesc": "#8e897f",
+      "IconBox": "#ffffff0d",
+      "Icon": "#d8d4cc",
+      "SwitchOff": "#ffffff1f",
+      "KnobOff": "#9a958c",
+      "KnobOn": "#ffffff",
+      "ButtonBg": "#ffffff0f",
+      "ButtonHover": "#ffffff22",
+      "ButtonText": "#dddddd",
+      "DotOff": "#ffffff26",
+      "ToastOkBg": "#1f2a1b",
+      "ToastOkBorder": "#6fbf5a66",
+      "ToastOkText": "#d6efcd",
+      "ToastOkIcon": "#8fe07a",
+      "ToastWarnBg": "#2a1b1b",
+      "ToastWarnBorder": "#d9606066",
+      "ToastWarnText": "#f3d0d0",
+      "ToastWarnIcon": "#ff8a8a",
+      "Palettes": {
+        "gold": {
+          "Accent": "#f2c35b",
+          "Light": "#ffe39a",
+          "Dark": "#a8701a",
+          "OnAccent": "#24190a"
+        },
+        "silver": {
+          "Accent": "#c9d2dc",
+          "Light": "#f2f6fa",
+          "Dark": "#7d8894",
+          "OnAccent": "#1b2026"
+        },
+        "bronze": {
+          "Accent": "#d8915a",
+          "Light": "#f3c39b",
+          "Dark": "#8a4f22",
+          "OnAccent": "#26150a"
+        },
+        "platinum": {
+          "Accent": "#9fe3e0",
+          "Light": "#e2fbfa",
+          "Dark": "#4f9a97",
+          "OnAccent": "#0f2423"
+        },
+        "emerald": {
+          "Accent": "#5fd38d",
+          "Light": "#b7f5cf",
+          "Dark": "#24804a",
+          "OnAccent": "#0b2415"
+        },
+        "ruby": {
+          "Accent": "#ef5a6f",
+          "Light": "#ffb0bb",
+          "Dark": "#9a2133",
+          "OnAccent": "#2a0a10"
+        },
+        "sapphire": {
+          "Accent": "#5f9cf2",
+          "Light": "#b9d6ff",
+          "Dark": "#2a5aa8",
+          "OnAccent": "#0b1830"
+        },
+        "amethyst": {
+          "Accent": "#b07cf2",
+          "Light": "#ddc4ff",
+          "Dark": "#6a3bb0",
+          "OnAccent": "#1d0f30"
+        }
+      }
+    }
+  },
+  "ConfigVersion": 1
+}

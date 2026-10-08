@@ -1,0 +1,236 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/csgostyles.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/pmm_vip.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/pmm_vip_theme.vcss_c" />
+	</styles>
+	<Panel class="vip-screen" hittest="false">
+		<Panel id="vip-root" class="vip-root vip-hidden view-main grp-gold">
+			<Panel class="vip-glow" hittest="false" />
+			<Panel class="vip-head">
+				<Panel class="vip-badge" hittest="false"><Label class="vip-badge-t stratum-bold-tf" text="{s:vip_brand}" /></Panel>
+				<Panel class="vip-ht" hittest="false">
+					<Label class="vip-nick stratum-bold-tf" text="{s:vip_nick}" />
+					<Panel class="vip-meta" hittest="false">
+						<Panel class="vip-group" hittest="false"><Label class="vip-group-t stratum-bold-tf" text="{s:vip_group}" /></Panel>
+						<Panel class="vip-clock" hittest="false" />
+						<Label class="vip-exp-pre stratum-medium-tf" text="{s:vip_exp_pre}" />
+						<Label class="vip-exp-date stratum-bold-tf" text="{s:vip_exp_date}" />
+						<Label class="vip-exp-left stratum-medium-tf" text="{s:vip_exp_left}" />
+					</Panel>
+				</Panel>
+				<Button id="vip-close" class="vip-x"><Label class="vip-x-t stratum-bold-tf" text="×" /></Button>
+			</Panel>
+			<Panel class="vip-sep" hittest="false" />
+			<Panel class="vip-sub only-sub" hittest="false">
+				<Panel class="vip-sub-icbox" hittest="false"><Panel id="vip-sub-ic" class="vt-ic ic-star" hittest="false" /></Panel>
+				<Panel class="vip-sub-text" hittest="false">
+					<Label class="vip-sub-title stratum-bold-tf" text="{s:vip_sub_title}" />
+					<Label class="vip-sub-hint stratum-medium-tf" text="{s:vip_sub_hint}" />
+				</Panel>
+			</Panel>
+			<Panel class="vip-grid only-main">
+				<Panel id="vip-gr-0" class="vip-grow">
+					<Button id="vt-0" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-0" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn0}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts0}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv0}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-1" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-1" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn1}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts1}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv1}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-2" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-2" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn2}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts2}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv2}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+				</Panel>
+				<Panel id="vip-gr-1" class="vip-grow">
+					<Button id="vt-3" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-3" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn3}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts3}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv3}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-4" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-4" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn4}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts4}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv4}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-5" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-5" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn5}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts5}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv5}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+				</Panel>
+				<Panel id="vip-gr-2" class="vip-grow">
+					<Button id="vt-6" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-6" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn6}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts6}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv6}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-7" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-7" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn7}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts7}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv7}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-8" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-8" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn8}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts8}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv8}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+				</Panel>
+				<Panel id="vip-gr-3" class="vip-grow">
+					<Button id="vt-9" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-9" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn9}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts9}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv9}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-10" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-10" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn10}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts10}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv10}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+					<Button id="vt-11" class="vt k-toggle">
+						<Panel class="vt-icbox" hittest="false"><Panel id="vt-ic-11" class="vt-ic ic-star" hittest="false" /></Panel>
+						<Panel class="vt-text" hittest="false">
+							<Label class="vt-name stratum-bold-tf" text="{s:vtn11}" />
+							<Label class="vt-desc stratum-medium-tf" text="{s:vts11}" />
+						</Panel>
+						<Panel class="vt-sw" hittest="false"><Panel class="vt-knob" hittest="false" /></Panel>
+						<Panel class="vt-chip" hittest="false"><Label class="vt-chip-t stratum-bold-tf" text="{s:vtv11}" /><Panel class="vt-chev" hittest="false" /></Panel>
+						<Panel class="vt-act" hittest="false"><Label class="vt-act-t stratum-bold-tf" text="{s:vip_use}" /></Panel>
+						<Panel class="vt-lock" hittest="false" />
+					</Button>
+				</Panel>
+			</Panel>
+			<Panel class="vip-chips only-pick">
+				<Panel id="vip-cr-0" class="vip-crow">
+					<Button id="vp-0" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc0}" /></Button>
+					<Button id="vp-1" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc1}" /></Button>
+					<Button id="vp-2" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc2}" /></Button>
+					<Button id="vp-3" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc3}" /></Button>
+				</Panel>
+				<Panel id="vip-cr-1" class="vip-crow">
+					<Button id="vp-4" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc4}" /></Button>
+					<Button id="vp-5" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc5}" /></Button>
+					<Button id="vp-6" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc6}" /></Button>
+					<Button id="vp-7" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc7}" /></Button>
+				</Panel>
+				<Panel id="vip-cr-2" class="vip-crow">
+					<Button id="vp-8" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc8}" /></Button>
+					<Button id="vp-9" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc9}" /></Button>
+					<Button id="vp-10" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc10}" /></Button>
+					<Button id="vp-11" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc11}" /></Button>
+				</Panel>
+				<Panel id="vip-cr-3" class="vip-crow">
+					<Button id="vp-12" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc12}" /></Button>
+					<Button id="vp-13" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc13}" /></Button>
+					<Button id="vp-14" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc14}" /></Button>
+					<Button id="vp-15" class="vp"><Label class="vp-t stratum-bold-tf" text="{s:vpc15}" /></Button>
+				</Panel>
+			</Panel>
+			<Panel class="vip-list only-list">
+				<Button id="vl-0" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr0}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-1" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr1}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-2" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr2}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-3" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr3}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-4" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr4}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-5" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr5}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-6" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr6}" /><Panel class="vl-chev" hittest="false" /></Button>
+				<Button id="vl-7" class="vl"><Label class="vl-t stratum-bold-tf" text="{s:vlr7}" /><Panel class="vl-chev" hittest="false" /></Button>
+			</Panel>
+			<Panel class="vip-foot">
+				<Panel class="vip-fleft" hittest="false">
+					<Button id="vip-back" class="vip-back"><Label class="vip-back-t stratum-bold-tf" text="{s:vip_back}" /></Button>
+					<Panel id="vip-toast" class="vip-toast" hittest="false"><Panel class="vip-toast-ic" hittest="false" /><Label class="vip-toast-t stratum-medium-tf" text="{s:vip_toast}" /></Panel>
+				</Panel>
+				<Panel class="vip-pager" hittest="false">
+					<Panel class="vip-pager-in" hittest="false">
+					<Button id="vip-prev" class="vip-pb"><Panel class="vip-pb-ic vip-pb-l" hittest="false" /></Button>
+					<Label class="vip-page stratum-bold-tf" text="{s:vip_page}" />
+					<Panel class="vip-dots" hittest="false">
+						<Panel id="vip-dot-0" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-1" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-2" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-3" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-4" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-5" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-6" class="vip-dot" hittest="false" />
+						<Panel id="vip-dot-7" class="vip-dot" hittest="false" />
+					</Panel>
+					<Button id="vip-next" class="vip-pb"><Panel class="vip-pb-ic" hittest="false" /></Button>
+					</Panel>
+				</Panel>
+				<Panel class="vip-fright" hittest="false" />
+			</Panel>
+		</Panel>
+	</Panel>
+</root>
