@@ -2,6 +2,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Menu;
 using MenuManager;
@@ -56,6 +57,7 @@ public partial class Plugin
         public List<IMenu>? Capture;                    // collecting a sub menu for an inline drop-down
         public int ToggleDepth;
         public bool Rebuild;                            // in-place update not possible, reopen !vip
+        public DateTime CloseAt;                        // auto close; default = off
     }
 
     private object? _core;       // VIPCore.VipCore instance
@@ -109,6 +111,60 @@ public partial class Plugin
         return true;
     }
 
+    // A CSS menu instance is shown for the first time although the Open hooks did not see it (JIT inlining).
+    // Drop it from CSS and show the menu through MenuManager. true = CSS must not draw it.
+    internal bool TryInterceptInstance(object instance)
+    {
+        if (!Active || _inPmmOpen > 0) return false;
+        if (Get(instance, "Menu") is not IMenu menu || Get(instance, "Player") is not CCSPlayerController player || !player.IsValid)
+            return false;
+        if (menu is VipMenu) return false;
+
+        var active = CounterStrikeSharp.API.Modules.Menu.MenuManager.GetActiveMenus();
+        if (!active.TryGetValue(player.Handle, out var current) || !ReferenceEquals(current, instance)) return false;
+
+        var st = State(player.Slot);
+        if (st.Capture == null)
+        {
+            string? owner = (Get(instance, "_plugin") as BasePlugin)?.GetType().Assembly.GetName().Name ?? CallerAssembly();
+            if (owner == null || !Matches(owner)) return false;
+            if (Config.Debug) Logger.LogInformation("[{Slot}] intercept {Type} '{Title}' from {Owner} at Display", player.Slot, instance.GetType().Name, menu.Title, owner);
+        }
+
+        // CenterHtmlMenuInstance also has an OnTick listener: Close() removes it and clears the center text.
+        try { instance.GetType().GetMethod("Close", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null)?.Invoke(instance, null); }
+        catch (TargetInvocationException) { }
+        active.Remove(player.Handle);
+
+        Show(player, menu);
+        return true;
+    }
+
+    // Module texts (GetTranslatedText): the translations file wins when it has the key.
+    internal void ModuleText(string? name, object[]? args, ref string result)
+    {
+        if (!Active || _tr == null || string.IsNullOrEmpty(name)) return;
+        System.Globalization.CultureInfo culture;
+        try
+        {
+            culture = Config.ModuleLanguage != ""
+                ? System.Globalization.CultureInfo.GetCultureInfo(Config.ModuleLanguage)
+                : System.Globalization.CultureInfo.CurrentUICulture;
+        }
+        catch (System.Globalization.CultureNotFoundException) { culture = System.Globalization.CultureInfo.CurrentUICulture; }
+
+        var text = _tr.Get(culture, name);
+        if (text == null) return;
+        string s;
+        try { s = args is { Length: > 0 } ? string.Format(text, args) : text; }
+        catch (FormatException) { s = text; }
+        result = CounterStrikeSharp.API.Core.Translations.StringExtensions.ReplaceColorTags(s);
+    }
+
+    // Every row disabled (WeaponsMenu before the round of its sets): nothing to pick, do not open.
+    private bool AllDisabled(IMenu menu) =>
+        Config.SkipDisabledMenus && menu.MenuOptions.Count > 0 && menu.MenuOptions.All(o => o.Disabled);
+
     // VipApi.PrintToChat during a !vip toggle -> MenuManager toast. true = chat line swallowed.
     internal bool TryNotify(CCSPlayerController? player, string? message)
     {
@@ -147,11 +203,18 @@ public partial class Plugin
         }
 
         bool main = _mainDepth > 0;
+        if (!main && AllDisabled(src))
+        {
+            if (Config.Debug) Logger.LogInformation("[{Slot}] '{Title}': every row is disabled, not opened", player.Slot, src.Title);
+            return;
+        }
         var sh = new Shown
         {
             Source = src,
             IsMain = main,
-            Parent = main ? null : st.Running.Count > 0 ? st.Running.Peek() : null,
+            // "Back" only inside the !vip chain. A module's own CSS menu (WeaponsMenu) that opens another one
+            // is replaced by it, as in CSS: no way back to the weapons list after a set was taken.
+            Parent = main ? null : st.Running.Count > 0 && FromVip(st.Running.Peek()) ? st.Running.Peek() : null,
         };
         Render(player, sh);
     }
@@ -171,11 +234,16 @@ public partial class Plugin
         public Action<CCSPlayerController, int>? Pick;
     }
 
+    // !vip itself, VIPCore API menus (VipApi.CreateMenu) and everything opened from them.
+    private static bool FromVip(Shown sh) => sh.IsMain || sh.Parent != null || sh.Source is VipMenu;
+
     private void Render(CCSPlayerController player, Shown sh)
     {
         var st = State(player.Slot);
         st.ShowCount++;
         st.Current = sh;
+        int seconds = FromVip(sh) ? Config.AutoCloseVipSeconds : Config.AutoCloseSeconds;
+        st.CloseAt = seconds > 0 ? DateTime.UtcNow.AddSeconds(seconds) : default;
 
         var src = sh.Source;
         MenuType type = _forceType ?? _api!.GetSelectedMenu(player);
@@ -521,7 +589,10 @@ public partial class Plugin
             return;
         }
 
-        if (sh.Source.PostSelectAction == PostSelectAction.Close)
+        // PostSelectAction.Close, or a module's own CSS menu (WeaponsMenu): after a pick it is done, as in CSS
+        // where the chat / center menu disappears. Otherwise the player could take the weapons again and again.
+        if (sh.Source.PostSelectAction == PostSelectAction.Close ||
+            (!FromVip(sh) && sh.Source.PostSelectAction != PostSelectAction.Nothing))
         {
             CloseFor(p);
             return;
@@ -553,7 +624,39 @@ public partial class Plugin
     {
         var st = State(p.Slot);
         st.Current = null;
+        st.CloseAt = default;
         if (_api!.HasOpenedMenu(p)) _api.CloseMenu(p);
+    }
+
+    // Every 0.25 s: auto close + countdown in the VIP panel.
+    private void AutoCloseTick()
+    {
+        if (!Active) return;
+        var now = DateTime.UtcNow;
+        foreach (var (slot, st) in _slots.ToList())
+        {
+            if (st.CloseAt == default || st.Current == null) continue;
+            var p = Utilities.GetPlayerFromSlot(slot);
+            if (p == null || !p.IsValid)
+            {
+                st.CloseAt = default;
+                continue;
+            }
+            // Closed by the player (× / Esc) or replaced by another plugin's menu: stop counting.
+            if (!_api!.HasOpenedMenu(p) || (slot < _paint.Length && _paint[slot].Open && !ReferenceEquals(_paint[slot].View?.Shown, st.Current)))
+            {
+                st.CloseAt = default;
+                continue;
+            }
+            int left = (int)Math.Ceiling((st.CloseAt - now).TotalSeconds);
+            if (left <= 0)
+            {
+                if (Config.Debug) Logger.LogInformation("[{Slot}] auto close", slot);
+                CloseFor(p);
+                continue;
+            }
+            PaintTimer(p, left);
+        }
     }
 
     // ---------------- helpers ----------------

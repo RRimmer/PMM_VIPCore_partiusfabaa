@@ -42,6 +42,22 @@ public class BridgeConfig : BasePluginConfig
 
     [JsonPropertyName("Debug")] public bool Debug { get; set; } = false;
 
+    // A module menu (WeaponsMenu ...) where every row is disabled is not opened at all
+    // (e.g. all weapon sets are "from round 3" and it is round 1).
+    [JsonPropertyName("SkipDisabledMenus")] public bool SkipDisabledMenus { get; set; } = true;
+
+    // Language of module texts (GetTranslatedText) from MenuManager_Modules_Translation.json:
+    // "" = the language CSS is using at that moment (player's for commands, server's in timers), or e.g. "ru".
+    [JsonPropertyName("ModuleLanguage")] public string ModuleLanguage { get; set; } = "";
+
+    // Auto close with a countdown in the panel. 0 = off.
+    // Module menus that pop up by themselves (WeaponsMenu on spawn ...):
+    [JsonPropertyName("AutoCloseSeconds")] public int AutoCloseSeconds { get; set; } = 20;
+    // !vip and the menus opened from it:
+    [JsonPropertyName("AutoCloseVipSeconds")] public int AutoCloseVipSeconds { get; set; } = 0;
+    // The countdown turns red for the last N seconds.
+    [JsonPropertyName("AutoCloseWarnSeconds")] public int AutoCloseWarnSeconds { get; set; } = 5;
+
     // Own VIP panorama (pmm_vip.xml) for players whose MenuManager menu is PanoramaMenu.
     [JsonPropertyName("Paint")] public PaintOptions Paint { get; set; } = new();
 }
@@ -184,4 +200,6 @@ public class PaintTexts
     [JsonPropertyName("ListHint")] public string ListHint { get; set; } = "";
     // {0} = page, {1} = pages
     [JsonPropertyName("Page")] public string Page { get; set; } = "{0} / {1}";
+    // {0} = seconds left
+    [JsonPropertyName("ClosesIn")] public string ClosesIn { get; set; } = "Закроется через {0} с";
 }

@@ -35,6 +35,10 @@
 .vip-back-t, .vip-page { color: #dddddd; }
 .vip-pb-ic { wash-color: #dddddd; }
 .vip-dot { background-color: #ffffff26; }
+.vip-timer-t { color: #a7a29a; }
+.vip-timer-ic { wash-color: #a7a29a; }
+.vip-root.timer-low .vip-timer-t { color: #ff8a8a; }
+.vip-root.timer-low .vip-timer-ic { wash-color: #ff8a8a; }
 .vip-toast { background-color: #1f2a1b; border: 1px solid #6fbf5a66; }
 .vip-toast-t { color: #d6efcd; }
 .vip-toast-ic { wash-color: #8fe07a; }

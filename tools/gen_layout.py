@@ -141,7 +141,9 @@ def xml() -> str:
     a(T * 5 + '<Button id="vip-next" class="vip-pb"><Panel class="vip-pb-ic" hittest="false" /></Button>')
     a(T * 5 + '</Panel>')
     a(T * 4 + '</Panel>')
-    a(T * 4 + '<Panel class="vip-fright" hittest="false" />')
+    a(T * 4 + '<Panel class="vip-fright" hittest="false">')
+    a(T * 5 + '<Panel class="vip-timer" hittest="false"><Panel class="vip-timer-ic" hittest="false" /><Label class="vip-timer-t stratum-medium-tf" text="{s:vip_timer}" /></Panel>')
+    a(T * 4 + '</Panel>')
     a(T * 3 + '</Panel>')
     a(T * 2 + '</Panel>')
     a(T + '</Panel>')
@@ -672,6 +674,40 @@ BASE = r"""/* ============================================================
 	height: 100%;
 	flow-children: right;
 }
+
+/* auto-close countdown (root class has-timer, timer-low for the last seconds) */
+.vip-timer
+{
+	height: 32px;
+	horizontal-align: right;
+	vertical-align: center;
+	flow-children: right;
+	visibility: collapse;
+}
+
+.vip-root.has-timer .vip-timer { visibility: visible; }
+
+.vip-timer-ic
+{
+	width: 15px;
+	height: 15px;
+	vertical-align: center;
+	background-image: url("s2r://panorama/images/icons/ui/clock.vsvg");
+	background-size: 100% 100%;
+	wash-color: #a7a29a;
+}
+
+.vip-timer-t
+{
+	margin-left: 6px;
+	vertical-align: center;
+	font-size: 13px;
+	color: #a7a29a;
+	white-space: nowrap;
+}
+
+.vip-root.timer-low .vip-timer-t { color: #ff8a8a; }
+.vip-root.timer-low .vip-timer-ic { wash-color: #ff8a8a; }
 
 .vip-back
 {

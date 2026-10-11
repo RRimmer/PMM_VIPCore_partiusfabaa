@@ -17,6 +17,11 @@
   "ExitButton": true,
   "StripColors": true,
   "Debug": false,
+  "SkipDisabledMenus": true,
+  "ModuleLanguage": "",
+  "AutoCloseSeconds": 20,
+  "AutoCloseVipSeconds": 0,
+  "AutoCloseWarnSeconds": 5,
   "Paint": {
     "Enabled": true,
     "LayoutPath": "panorama/layout/custom_game/pmm_vip.xml",
@@ -44,7 +49,8 @@
       "Back": "‹ НАЗАД",
       "PickHint": "Выбери значение",
       "ListHint": "",
-      "Page": "{0} / {1}"
+      "Page": "{0} / {1}",
+      "ClosesIn": "Закроется через {0} с"
     },
     "Theme": {
       "PanelTop": "#19171cf5",

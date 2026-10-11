@@ -4,6 +4,26 @@
 
 ## English
 
+### 0.1.3 — 2026-10-11
+- A module's own menu (WeaponsMenu) closes after a pick, as the CSS chat / center menu does. Its follow-up menu
+  ("save this set?") has no "Back" to the weapons list any more. Before, the panel stayed open and the weapons
+  could be dropped and taken again without limit.
+- Auto close with a countdown "Closes in N s" in the panel footer (red for the last `AutoCloseWarnSeconds`):
+  `AutoCloseSeconds` (module pop-up menus, default 20) and `AutoCloseVipSeconds` (`!vip` and its sub menus, default 0 = off).
+  New text `pmm_vip.closes_in` / `Paint.Texts.ClosesIn`. The addon needs the new `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
+
+### 0.1.2 — 2026-10-11
+- VIP module texts (`GetTranslatedText`: `weaponsmenu.*`, `buyteamweapon.*`, `fov.*`, `tag.*`, `respawn.*` …) come from
+  `MenuManager_Modules_Translation.json` with their arguments (`{0}`) and chat colours. Fixed: WeaponsMenu showed
+  `weaponsmenu.title`, `weaponsmenu.fromround …` in the menu and `weaponsmenu.saved` … in chat.
+- Missing keys of the `PMM_VIPCore` section are added on every start (before: only when the section did not exist).
+  Existing keys are not changed. INSTALL.md has the full block for adding it by hand.
+- WeaponsMenu "save this set?" opened as a chat menu: the JIT inlined `ChatMenu.Open` / `MenuManager.OpenChatMenu`
+  into the small module method. New fallback hook on `ChatMenuInstance` / `CenterHtmlMenuInstance.Display`.
+- `SkipDisabledMenus` (on): a module menu where every row is disabled is not opened — WeaponsMenu shows up only
+  from the round its first set becomes available.
+- `ModuleLanguage`: force the language of module texts (`""` = current CSS language).
+
 ### 0.1.1 — 2026-10-08
 - Panel colours in the config: `Paint.Theme` (background, border, tiles, text, switch, buttons, status line) and
   group palettes `Paint.Theme.Palettes` (add your own). The plugin writes `pmm_vip_theme.css` on load and on
@@ -35,6 +55,26 @@
 - Server command `css_pmm_vip [repatch]`.
 
 ## Русский
+
+### 0.1.3 — 2026-10-11
+- Собственное меню модуля (WeaponsMenu) закрывается после выбора, как чат / центр-меню CSS. У следующего меню
+  («сохранить набор?») больше нет «Назад» к списку оружия. Раньше панель оставалась открытой, и оружие можно было
+  выбросить и взять снова сколько угодно раз.
+- Автозакрытие с отсчётом «Закроется через N с» внизу панели (красным последние `AutoCloseWarnSeconds`):
+  `AutoCloseSeconds` (всплывающие меню модулей, по умолчанию 20) и `AutoCloseVipSeconds` (`!vip` и его подменю, по умолчанию 0 = выкл.).
+  Новый текст `pmm_vip.closes_in` / `Paint.Texts.ClosesIn`. В аддон нужны новые `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
+
+### 0.1.2 — 2026-10-11
+- Тексты VIP-модулей (`GetTranslatedText`: `weaponsmenu.*`, `buyteamweapon.*`, `fov.*`, `tag.*`, `respawn.*` …) берутся из
+  `MenuManager_Modules_Translation.json` с аргументами (`{0}`) и цветами чата. Исправлено: WeaponsMenu показывал
+  `weaponsmenu.title`, `weaponsmenu.fromround …` в меню и `weaponsmenu.saved` … в чате.
+- Недостающие ключи раздела `PMM_VIPCore` дописываются при каждом запуске (раньше — только если раздела не было).
+  Существующие ключи не меняются. В INSTALL.md — полный блок для ручного добавления.
+- Меню WeaponsMenu «сохранить набор?» открывалось в чате: JIT встраивал `ChatMenu.Open` / `MenuManager.OpenChatMenu`
+  в маленький метод модуля. Добавлен запасной хук на `ChatMenuInstance` / `CenterHtmlMenuInstance.Display`.
+- `SkipDisabledMenus` (вкл.): меню модуля, где все строки недоступны, не открывается — WeaponsMenu появляется только
+  с раунда, когда доступен первый набор.
+- `ModuleLanguage`: принудительный язык текстов модулей (`""` — текущий язык CSS).
 
 ### 0.1.1 — 2026-10-08
 - Цвета панели в конфиге: `Paint.Theme` (фон, рамка, плитки, текст, ползунок, кнопки, статус) и палитры групп

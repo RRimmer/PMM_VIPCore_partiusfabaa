@@ -522,6 +522,40 @@
 	flow-children: right;
 }
 
+/* auto-close countdown (root class has-timer, timer-low for the last seconds) */
+.vip-timer
+{
+	height: 32px;
+	horizontal-align: right;
+	vertical-align: center;
+	flow-children: right;
+	visibility: collapse;
+}
+
+.vip-root.has-timer .vip-timer { visibility: visible; }
+
+.vip-timer-ic
+{
+	width: 15px;
+	height: 15px;
+	vertical-align: center;
+	background-image: url("s2r://panorama/images/icons/ui/clock.vsvg");
+	background-size: 100% 100%;
+	wash-color: #a7a29a;
+}
+
+.vip-timer-t
+{
+	margin-left: 6px;
+	vertical-align: center;
+	font-size: 13px;
+	color: #a7a29a;
+	white-space: nowrap;
+}
+
+.vip-root.timer-low .vip-timer-t { color: #ff8a8a; }
+.vip-root.timer-low .vip-timer-ic { wash-color: #ff8a8a; }
+
 .vip-back
 {
 	height: 32px;

@@ -44,7 +44,8 @@ internal sealed class VipTranslations
         }
     }
 
-    // Adds the PMM_VIPCore section when the file does not have it yet. Other sections stay as they are.
+    // Adds the PMM_VIPCore section, or the keys / languages it is missing (a new version brings new keys).
+    // Keys that are already there are never changed: the admin's texts stay. Other sections stay as they are.
     public void EnsureSection()
     {
         try
@@ -63,7 +64,6 @@ internal sealed class VipTranslations
                     return;
                 }
                 root = obj;
-                if (root.ContainsKey(Section)) return;
             }
             else
             {
@@ -71,20 +71,33 @@ internal sealed class VipTranslations
                 root = new JsonObject();
             }
 
-            var section = new JsonObject();
+            bool created = root[Section] is not JsonObject;
+            if (created) root[Section] = new JsonObject();
+            var section = (JsonObject)root[Section]!;
+            int added = 0;
             foreach (var (lang, map) in VipDefaults.Texts)
             {
-                var o = new JsonObject();
-                foreach (var (k, v) in map) o[k] = v;
-                section[lang] = o;
+                if (section[lang] is not JsonObject o)
+                {
+                    o = new JsonObject();
+                    section[lang] = o;
+                }
+                foreach (var (k, v) in map)
+                {
+                    if (o.ContainsKey(k)) continue;
+                    o[k] = v;
+                    added++;
+                }
             }
-            root[Section] = section;
+            if (added == 0) return;
+
             File.WriteAllText(_path, root.ToJsonString(new JsonSerializerOptions
             {
                 WriteIndented = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             }));
-            _log.LogInformation("Translations: section {Section} added to {Path}", Section, _path);
+            _log.LogInformation("Translations: {Count} keys {What} section {Section} of {Path}",
+                added, created ? "written to the new" : "added to the", Section, _path);
         }
         catch (Exception e)
         {
@@ -194,6 +207,7 @@ internal static class VipDefaults
             ["pmm_vip.pick_hint"] = "Выбери значение",
             ["pmm_vip.page"] = "{0} / {1}",
             ["pmm_vip.title"] = "VIP меню — {0}",
+            ["pmm_vip.closes_in"] = "Закроется через {0} с",
 
             ["Antiflash"] = "Анти-флеш",
             ["Armor"] = "Броня",
@@ -239,6 +253,36 @@ internal static class VipDefaults
             ["fov.Disable"] = "Выкл.",
             ["tag.Disable"] = "Без тега",
 
+            // texts of VIP modules (VIPCore GetTranslatedText); {colour} tags as in VIPCore lang files
+            ["fov.On"] = "Вы установили {blue}FOV {default}на {red}{0}",
+            ["fov.Off"] = "Вы выключили {blue}FOV",
+            ["tag.On"] = "Вы установили {blue}тег {default}на {red}{0}",
+            ["tag.Off"] = "Вы выключили {blue}тег",
+            ["bhop.Activated"] = "Банихоп активирован!",
+            ["bhop.TimeToActivation"] = "Банихоп будет активен через {red}{0}{default} сек.",
+            ["respawn.Limit"] = "Лимит возрождений исчерпан!",
+            ["respawn.InTeam"] = "Вы должны быть в команде!",
+            ["respawn.IsAlive"] = "Вы должны быть мертвы!",
+            ["respawn.Success"] = "Вы успешно возродились!",
+            ["vip.NoAccess"] = "У вас нет доступа к этой команде!",
+            ["vip.AlreadyVipPrivileges"] = "У вас уже есть VIP-привилегия.",
+            ["vip.ResetDeaths"] = "Ваши смерти сброшены!",
+            ["viptest.YouCanNoLongerTakeTheVip"] = "Вы больше не можете взять VIP-Test",
+            ["viptest.RetakenThrough"] = "Взять VIP-Test повторно можно через: {0}",
+            ["viptest.SuccessfullyPassed"] = "Вы взяли VIP-Test! Заканчивается через: {0}",
+            ["buyteamweapon.round_start"] = "Можно купить оружие другой команды: {green}{0}",
+            ["buyteamweapon.in_buy_zone"] = "Вы должны быть в зоне закупки!",
+            ["buyteamweapon.no_money"] = "Недостаточно денег!",
+            ["weaponsmenu.title"] = "Выберите набор оружия",
+            ["weaponsmenu.fromround"] = "[С {0} раунда]",
+            ["weaponsmenu.wanttosave"] = "Сохранить этот набор?",
+            ["weaponsmenu.wanttosave.yes"] = "Да",
+            ["weaponsmenu.wanttosave.no"] = "Нет",
+            ["weaponsmenu.saved"] = "Набор сохранён, вы будете получать его автоматически!",
+            ["weaponsmenu.notsaved"] = "Набор не сохранён, в следующем раунде можно выбрать снова.",
+            ["weaponsmenu.resetinfo.reset"] = "Набор сброшен, выберите новый в следующем раунде!",
+            ["weaponsmenu.resetinfo.info"] = "Хотите сменить набор? Команда {orange}!vwmenu{default} — выбор в следующем раунде.",
+
             ["pmm_vip.value.Health"] = "{0} HP",
             ["pmm_vip.value.Armor"] = "{0} брони",
             ["pmm_vip.value.Speed"] = "x{0}",
@@ -266,6 +310,7 @@ internal static class VipDefaults
             ["pmm_vip.pick_hint"] = "Pick a value",
             ["pmm_vip.page"] = "{0} / {1}",
             ["pmm_vip.title"] = "VIP menu — {0}",
+            ["pmm_vip.closes_in"] = "Closes in {0}s",
 
             ["Antiflash"] = "Anti-Flash",
             ["Armor"] = "Armor",
@@ -310,6 +355,35 @@ internal static class VipDefaults
 
             ["fov.Disable"] = "Off",
             ["tag.Disable"] = "No tag",
+
+            ["fov.On"] = "You have set {blue}FOV {default}to {red}{0}",
+            ["fov.Off"] = "You've disabled the {blue}FOV",
+            ["tag.On"] = "You have set {blue}Tag {default}to {red}{0}",
+            ["tag.Off"] = "You've disabled the {blue}Tag",
+            ["bhop.Activated"] = "BunnyHop activated!",
+            ["bhop.TimeToActivation"] = "BunnyHop will be active in {red}{0}{default}s.",
+            ["respawn.Limit"] = "Respawn limit reached!",
+            ["respawn.InTeam"] = "You must be in a team!",
+            ["respawn.IsAlive"] = "You must be dead!",
+            ["respawn.Success"] = "Respawn successful!",
+            ["vip.NoAccess"] = "You don't have access to this command!",
+            ["vip.AlreadyVipPrivileges"] = "You already have VIP privileges.",
+            ["vip.ResetDeaths"] = "Your deaths are reset!",
+            ["viptest.YouCanNoLongerTakeTheVip"] = "You can no longer take the VIP Test.",
+            ["viptest.RetakenThrough"] = "The VIP test can be retaken in: {0}.",
+            ["viptest.SuccessfullyPassed"] = "You have taken the VIP test! Ends in: {0}.",
+            ["buyteamweapon.round_start"] = "You can buy the other team's weapons: {green}{0}",
+            ["buyteamweapon.in_buy_zone"] = "You must be in the buy zone!",
+            ["buyteamweapon.no_money"] = "Not enough money!",
+            ["weaponsmenu.title"] = "Select weapons package",
+            ["weaponsmenu.fromround"] = "[From round {0}]",
+            ["weaponsmenu.wanttosave"] = "Do you want to save this set?",
+            ["weaponsmenu.wanttosave.yes"] = "Yes",
+            ["weaponsmenu.wanttosave.no"] = "No",
+            ["weaponsmenu.saved"] = "Your free set has been saved, you will receive it when possible!",
+            ["weaponsmenu.notsaved"] = "Your free set was not saved, you can choose a new one next round.",
+            ["weaponsmenu.resetinfo.reset"] = "Your free set has been reset, choose a new one next round!",
+            ["weaponsmenu.resetinfo.info"] = "Want another set? Use {orange}!vwmenu{default} to choose a new one next round.",
 
             ["pmm_vip.value.Health"] = "{0} HP",
             ["pmm_vip.value.Armor"] = "{0} armor",

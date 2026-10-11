@@ -6,7 +6,7 @@
 
 Bridge by **Rimmer** between [VIPCore](https://github.com/partiusfabaa/cs2-VIPCore) (thesamefabius) and [PanoramaMenuManager](https://github.com/RRimmer/PanoramaMenuManagerCS2) (MenuManagerCS2 1.2.03). VIPCore and its modules are not changed: Harmony patches them at runtime.
 
-Current version: **0.1.1**. Needs CounterStrikeSharp 1.0.376 (.NET 10), the original VIPCore v1.3.3 and MenuManager 1.2.03.
+Current version: **0.1.3**. Needs CounterStrikeSharp 1.0.376 (.NET 10), the original VIPCore v1.3.3 and MenuManager 1.2.03.
 
 - `!vip` and every VIP module menu open in MenuManager (the player's menu type from `!menu`).
 - Own VIP panorama for PanoramaMenu players: nickname, VIP group and expiry in the header, 3×4 tiles with CS2 icons,
@@ -68,7 +68,7 @@ The changelog is in [CHANGELOG.md](CHANGELOG.md).
 
 Мост от **Rimmer** между [VIPCore](https://github.com/partiusfabaa/cs2-VIPCore) (thesamefabius) и [PanoramaMenuManager](https://github.com/RRimmer/PanoramaMenuManagerCS2) (MenuManagerCS2 1.2.03). VIPCore и модули не меняются: Harmony патчит их в рантайме.
 
-Текущая версия: **0.1.1**. Нужен CounterStrikeSharp 1.0.376 (.NET 10), оригинальный VIPCore v1.3.3 и MenuManager 1.2.03.
+Текущая версия: **0.1.3**. Нужен CounterStrikeSharp 1.0.376 (.NET 10), оригинальный VIPCore v1.3.3 и MenuManager 1.2.03.
 
 - `!vip` и меню всех VIP-модулей открываются в MenuManager (тип меню игрока из `!menu`).
 - Своя VIP-панорама для игроков с PanoramaMenu: ник, группа и срок VIP в шапке, плитки 3×4 с иконками CS2,

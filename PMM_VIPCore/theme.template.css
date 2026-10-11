@@ -35,6 +35,10 @@
 .vip-back-t, .vip-page { color: {{ButtonText}}; }
 .vip-pb-ic { wash-color: {{ButtonText}}; }
 .vip-dot { background-color: {{DotOff}}; }
+.vip-timer-t { color: {{Muted}}; }
+.vip-timer-ic { wash-color: {{Muted}}; }
+.vip-root.timer-low .vip-timer-t { color: {{ToastWarnIcon}}; }
+.vip-root.timer-low .vip-timer-ic { wash-color: {{ToastWarnIcon}}; }
 .vip-toast { background-color: {{ToastOkBg}}; border: 1px solid {{ToastOkBorder}}; }
 .vip-toast-t { color: {{ToastOkText}}; }
 .vip-toast-ic { wash-color: {{ToastOkIcon}}; }

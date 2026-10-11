@@ -229,7 +229,9 @@
 					<Button id="vip-next" class="vip-pb"><Panel class="vip-pb-ic" hittest="false" /></Button>
 					</Panel>
 				</Panel>
-				<Panel class="vip-fright" hittest="false" />
+				<Panel class="vip-fright" hittest="false">
+					<Panel class="vip-timer" hittest="false"><Panel class="vip-timer-ic" hittest="false" /><Label class="vip-timer-t stratum-medium-tf" text="{s:vip_timer}" /></Panel>
+				</Panel>
 			</Panel>
 		</Panel>
 	</Panel>

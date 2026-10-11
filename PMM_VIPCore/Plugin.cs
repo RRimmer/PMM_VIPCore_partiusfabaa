@@ -15,7 +15,7 @@ namespace PMM_VIPCore;
 public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
 {
     public override string ModuleName => "PMM_VIPCore";
-    public override string ModuleVersion => "0.1.1";
+    public override string ModuleVersion => "0.1.3";
     public override string ModuleAuthor => "Rimmer";
     public override string ModuleDescription => "Shows VIPCore (thesamefabius) menus through PanoramaMenuManager (Harmony bridge)";
 
@@ -62,6 +62,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         _tr.EnsureSection();
         WriteThemeCss();
         PaintLoad();
+        AddTimer(0.25f, AutoCloseTick, CounterStrikeSharp.API.Modules.Timers.TimerFlags.REPEAT);
     }
 
     private VipTranslations? _tr;
@@ -151,6 +152,9 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         TryPatch(_coreCreateMenu, p.GetMethod(nameof(Patches.MainPrefix)), null, p.GetMethod(nameof(Patches.MainFinalizer)));
         // VipApi.PrintToChat: "Bhop: Enabled" after a toggle -> MenuManager toast.
         TryPatch(apiPrint, p.GetMethod(nameof(Patches.PrintPrefix)), null, null);
+        // VipApi.GetTranslatedText(name, args): module texts (weaponsmenu.*, buyteamweapon.* ...) from the translations file.
+        TryPatch(tApi.GetMethod("GetTranslatedText", Any, null, new[] { typeof(string), typeof(object[]) }, null),
+            null, p.GetMethod(nameof(Patches.TextPostfix)), null);
 
         if (!_patched.Contains("VipCoreApi.CreateMenu"))
         {
@@ -170,6 +174,13 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
             TryPatch(typeof(CenterHtmlMenu).GetMethod("Open", new[] { typeof(CCSPlayerController) }), p.GetMethod(nameof(Patches.CenterOpenPrefix)), null, null);
             TryPatch(cssMm?.GetMethod("OpenChatMenu", BindingFlags.Public | BindingFlags.Static), p.GetMethod(nameof(Patches.OpenChatMenuPrefix)), null, null);
             TryPatch(cssMm?.GetMethod("OpenCenterHtmlMenu", BindingFlags.Public | BindingFlags.Static), p.GetMethod(nameof(Patches.OpenCenterHtmlMenuPrefix)), null, null);
+            // Last line of defence: a small module method (VIP_WeaponsMenu.CreateSubMenu) may get ChatMenu.Open and
+            // MenuManager.OpenChatMenu inlined by the JIT, which skips the hooks above. Display() is always called
+            // through the IMenuInstance interface, so it cannot be inlined.
+            var tChatInst = typeof(ChatMenu).Assembly.GetType("CounterStrikeSharp.API.Modules.Menu.ChatMenuInstance");
+            var tCenterInst = typeof(ChatMenu).Assembly.GetType("CounterStrikeSharp.API.Modules.Menu.CenterHtmlMenuInstance");
+            TryPatch(tChatInst?.GetMethod("Display", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null), p.GetMethod(nameof(Patches.DisplayPrefix)), null, null);
+            TryPatch(tCenterInst?.GetMethod("Display", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null), p.GetMethod(nameof(Patches.DisplayPrefix)), null, null);
             _cssHooks = _patched.Count > before;
         }
 
@@ -273,6 +284,17 @@ internal static class Patches
         try { return !(Plugin.Instance?.TryNotify(__0, __1) ?? false); }
         catch { return true; }
     }
+
+    // VipCoreApi.GetTranslatedText(name, args) -> text from MenuManager_Modules_Translation.json when it has the key
+    public static void TextPostfix(string __0, object[] __1, ref string __result)
+    {
+        try { Plugin.Instance?.ModuleText(__0, __1, ref __result); }
+        catch (Exception e) { Plugin.Instance?.Logger.LogError(e, "module text {Key} failed", __0); }
+    }
+
+    // ChatMenuInstance.Display / CenterHtmlMenuInstance.Display. false = MenuManager shows the menu instead.
+    public static bool DisplayPrefix(object __instance)
+        => !Safe(() => Plugin.Instance?.TryInterceptInstance(__instance) ?? false);
 
     // CSS menus opened by VIP modules. false = MenuManager shows it instead.
     public static bool ChatOpenPrefix(ChatMenu __instance, CCSPlayerController __0)

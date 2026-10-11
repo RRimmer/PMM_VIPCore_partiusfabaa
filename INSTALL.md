@@ -4,7 +4,7 @@
 
 ## English
 
-### PMM_VIPCore 0.1.1 — install
+### PMM_VIPCore 0.1.3 — install
 
 Bridge: menus of the original VIPCore (thesamefabius, v1.3.3 / release recompile3) are shown through PanoramaMenuManager.
 VIPCore and its modules are not rebuilt — everything goes through Harmony, as in PMM_GG1MapChooser.
@@ -51,7 +51,8 @@ On screen:
   a value with a list / "▶ USE" / a lock "No access";
 - a click on Fov / Tag opens a 4×4 value picker;
 - module sub menus (WeaponsMenu etc.) are an 8-row list with "Back";
-- status line bottom left, pages bottom centre; the page is remembered per menu.
+- status line bottom left, pages bottom centre, auto-close countdown bottom right; the page is remembered per menu;
+- a module's own menu (WeaponsMenu) closes after a pick and has no "Back", as in CSS.
 
 Layout generator: `tools/gen_layout.py` (icons, palettes, tile count — ids and classes must match `Paint.cs`).
 
@@ -78,12 +79,227 @@ A new palette works only after the updated `pmm_vip_theme.css` is in the addon.
 #### Names and texts (MenuManager_Modules_Translation.json)
 On the first start the plugin adds a `PMM_VIPCore` section (ru / en) to
 `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` — the same file MenuManager uses.
-The section is added once, after that the file is yours; changes are picked up on the fly.
+Missing keys are added on every start, existing ones are never changed; changes are picked up on the fly.
 - feature key (`Health`, `ShowDamage`, `SoundDMG`, `Tag` …) — tile name;
 - `tag.Disable`, `fov.Disable` and any module keys — labels in the value lists;
 - `pmm_vip.*` — panel texts (`pmm_vip.back`, `pmm_vip.enabled`, `pmm_vip.forever` …);
 - `pmm_vip.title` — `!vip` title (`{0}` = group), `pmm_vip.value.<Feature>` — value label (`{0} HP`).
 Language = the player's CS2 language; if a key is missing — `en`, then `Paint.Texts` / `Paint.ValueFormat` of the config.
+
+#### Translations to add by hand (only if they did not appear automatically)
+On every start the plugin adds the missing keys of the `PMM_VIPCore` section to
+`configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` by itself (keys that are already there are not changed).
+**Only if** the section or some keys did not appear (file is read-only, the JSON has an error, the server log shows
+`Translations: could not add …`), add this block to the root object of the file by hand
+(put a comma after the previous section):
+
+```json
+"PMM_VIPCore": {
+    "ru": {
+      "pmm_vip.brand": "VIP",
+      "pmm_vip.forever": "навсегда",
+      "pmm_vip.until": "до",
+      "pmm_vip.days_left": "· {0} дн.",
+      "pmm_vip.enabled": "Включено",
+      "pmm_vip.disabled": "Выключено",
+      "pmm_vip.no_access": "Нет доступа",
+      "pmm_vip.use": "▶ ИСП.",
+      "pmm_vip.back": "‹ НАЗАД",
+      "pmm_vip.pick_hint": "Выбери значение",
+      "pmm_vip.page": "{0} / {1}",
+      "pmm_vip.title": "VIP меню — {0}",
+      "pmm_vip.closes_in": "Закроется через {0} с",
+      "Antiflash": "Анти-флеш",
+      "Armor": "Броня",
+      "ArmorRegen": "Реген брони",
+      "Bhop": "Банихоп",
+      "BuyTeamWeapon": "Оружие другой команды",
+      "CustomDefaultAmmo": "Патроны",
+      "DamageMultiplier": "Множитель урона",
+      "DecoyTp": "Телепорт-граната",
+      "DefuseKit": "Набор сапёра",
+      "Defuser": "Набор сапёра",
+      "FastReload": "Быстрая перезарядка",
+      "Fov": "Поле зрения (FOV)",
+      "Gravity": "Гравитация",
+      "Grenades": "Гранаты",
+      "Health": "Здоровье",
+      "HealthRegen": "Реген здоровья",
+      "Healthshot": "Медшприц",
+      "InfiniteAmmo": "Бесконечные патроны",
+      "Items": "Предметы",
+      "Jumps": "Доп. прыжки",
+      "Killscreen": "Эффект убийства",
+      "Money": "Деньги",
+      "NoFallDamage": "Без урона от падения",
+      "RainbowModel": "Радужная модель",
+      "ResetDeaths": "Сброс смертей",
+      "Respawn": "Возрождение",
+      "ShowDamage": "Показ урона",
+      "SmokeColor": "Цветной дым",
+      "SoundDMG": "Звук попадания",
+      "Speed": "Скорость",
+      "Tag": "Клан-тег",
+      "TeammatesHeal": "Лечение союзников",
+      "Vampirism": "Вампиризм",
+      "WeaponsMenu": "Меню оружия",
+      "Zeus": "Zeus",
+      "endurance": "Выносливость",
+      "exp_multiplier": "Множитель опыта",
+      "fastdefuse": "Быстрое разминирование",
+      "fastplant": "Быстрая установка",
+      "flags": "Флаги",
+      "fov.Disable": "Выкл.",
+      "tag.Disable": "Без тега",
+      "fov.On": "Вы установили {blue}FOV {default}на {red}{0}",
+      "fov.Off": "Вы выключили {blue}FOV",
+      "tag.On": "Вы установили {blue}тег {default}на {red}{0}",
+      "tag.Off": "Вы выключили {blue}тег",
+      "bhop.Activated": "Банихоп активирован!",
+      "bhop.TimeToActivation": "Банихоп будет активен через {red}{0}{default} сек.",
+      "respawn.Limit": "Лимит возрождений исчерпан!",
+      "respawn.InTeam": "Вы должны быть в команде!",
+      "respawn.IsAlive": "Вы должны быть мертвы!",
+      "respawn.Success": "Вы успешно возродились!",
+      "vip.NoAccess": "У вас нет доступа к этой команде!",
+      "vip.AlreadyVipPrivileges": "У вас уже есть VIP-привилегия.",
+      "vip.ResetDeaths": "Ваши смерти сброшены!",
+      "viptest.YouCanNoLongerTakeTheVip": "Вы больше не можете взять VIP-Test",
+      "viptest.RetakenThrough": "Взять VIP-Test повторно можно через: {0}",
+      "viptest.SuccessfullyPassed": "Вы взяли VIP-Test! Заканчивается через: {0}",
+      "buyteamweapon.round_start": "Можно купить оружие другой команды: {green}{0}",
+      "buyteamweapon.in_buy_zone": "Вы должны быть в зоне закупки!",
+      "buyteamweapon.no_money": "Недостаточно денег!",
+      "weaponsmenu.title": "Выберите набор оружия",
+      "weaponsmenu.fromround": "[С {0} раунда]",
+      "weaponsmenu.wanttosave": "Сохранить этот набор?",
+      "weaponsmenu.wanttosave.yes": "Да",
+      "weaponsmenu.wanttosave.no": "Нет",
+      "weaponsmenu.saved": "Набор сохранён, вы будете получать его автоматически!",
+      "weaponsmenu.notsaved": "Набор не сохранён, в следующем раунде можно выбрать снова.",
+      "weaponsmenu.resetinfo.reset": "Набор сброшен, выберите новый в следующем раунде!",
+      "weaponsmenu.resetinfo.info": "Хотите сменить набор? Команда {orange}!vwmenu{default} — выбор в следующем раунде.",
+      "pmm_vip.value.Health": "{0} HP",
+      "pmm_vip.value.Armor": "{0} брони",
+      "pmm_vip.value.Speed": "x{0}",
+      "pmm_vip.value.Gravity": "x{0}",
+      "pmm_vip.value.Money": "${0}",
+      "pmm_vip.value.Jumps": "+{0}",
+      "pmm_vip.value.Vampirism": "{0}%",
+      "pmm_vip.value.DamageMultiplier": "x{0}",
+      "pmm_vip.value.HealthRegen": "+{0} HP",
+      "pmm_vip.value.ArmorRegen": "+{0}",
+      "pmm_vip.value.Healthshot": "{0} шт.",
+      "pmm_vip.value.exp_multiplier": "x{0}"
+    },
+    "en": {
+      "pmm_vip.brand": "VIP",
+      "pmm_vip.forever": "forever",
+      "pmm_vip.until": "until",
+      "pmm_vip.days_left": "· {0} d.",
+      "pmm_vip.enabled": "Enabled",
+      "pmm_vip.disabled": "Disabled",
+      "pmm_vip.no_access": "No access",
+      "pmm_vip.use": "▶ USE",
+      "pmm_vip.back": "‹ BACK",
+      "pmm_vip.pick_hint": "Pick a value",
+      "pmm_vip.page": "{0} / {1}",
+      "pmm_vip.title": "VIP menu — {0}",
+      "pmm_vip.closes_in": "Closes in {0}s",
+      "Antiflash": "Anti-Flash",
+      "Armor": "Armor",
+      "ArmorRegen": "Armor Regen",
+      "Bhop": "BunnyHop",
+      "BuyTeamWeapon": "Enemy Team Weapons",
+      "CustomDefaultAmmo": "Ammo",
+      "DamageMultiplier": "Damage Multiplier",
+      "DecoyTp": "Teleport Grenade",
+      "DefuseKit": "Defuse Kit",
+      "Defuser": "Defuse Kit",
+      "FastReload": "Fast Reload",
+      "Fov": "Field of View",
+      "Gravity": "Gravity",
+      "Grenades": "Grenades",
+      "Health": "Health",
+      "HealthRegen": "Health Regen",
+      "Healthshot": "Healthshot",
+      "InfiniteAmmo": "Infinite Ammo",
+      "Items": "Items",
+      "Jumps": "Extra Jumps",
+      "Killscreen": "Kill Effect",
+      "Money": "Money",
+      "NoFallDamage": "No Fall Damage",
+      "RainbowModel": "Rainbow Model",
+      "ResetDeaths": "Reset Deaths",
+      "Respawn": "Respawn",
+      "ShowDamage": "Show Damage",
+      "SmokeColor": "Smoke Color",
+      "SoundDMG": "Hit Sound",
+      "Speed": "Speed",
+      "Tag": "Clan Tag",
+      "TeammatesHeal": "Heal Teammates",
+      "Vampirism": "Vampirism",
+      "WeaponsMenu": "Weapons Menu",
+      "Zeus": "Zeus",
+      "endurance": "Endurance",
+      "exp_multiplier": "XP Multiplier",
+      "fastdefuse": "Fast Defuse",
+      "fastplant": "Fast Plant",
+      "flags": "Flags",
+      "fov.Disable": "Off",
+      "tag.Disable": "No tag",
+      "fov.On": "You have set {blue}FOV {default}to {red}{0}",
+      "fov.Off": "You've disabled the {blue}FOV",
+      "tag.On": "You have set {blue}Tag {default}to {red}{0}",
+      "tag.Off": "You've disabled the {blue}Tag",
+      "bhop.Activated": "BunnyHop activated!",
+      "bhop.TimeToActivation": "BunnyHop will be active in {red}{0}{default}s.",
+      "respawn.Limit": "Respawn limit reached!",
+      "respawn.InTeam": "You must be in a team!",
+      "respawn.IsAlive": "You must be dead!",
+      "respawn.Success": "Respawn successful!",
+      "vip.NoAccess": "You don't have access to this command!",
+      "vip.AlreadyVipPrivileges": "You already have VIP privileges.",
+      "vip.ResetDeaths": "Your deaths are reset!",
+      "viptest.YouCanNoLongerTakeTheVip": "You can no longer take the VIP Test.",
+      "viptest.RetakenThrough": "The VIP test can be retaken in: {0}.",
+      "viptest.SuccessfullyPassed": "You have taken the VIP test! Ends in: {0}.",
+      "buyteamweapon.round_start": "You can buy the other team's weapons: {green}{0}",
+      "buyteamweapon.in_buy_zone": "You must be in the buy zone!",
+      "buyteamweapon.no_money": "Not enough money!",
+      "weaponsmenu.title": "Select weapons package",
+      "weaponsmenu.fromround": "[From round {0}]",
+      "weaponsmenu.wanttosave": "Do you want to save this set?",
+      "weaponsmenu.wanttosave.yes": "Yes",
+      "weaponsmenu.wanttosave.no": "No",
+      "weaponsmenu.saved": "Your free set has been saved, you will receive it when possible!",
+      "weaponsmenu.notsaved": "Your free set was not saved, you can choose a new one next round.",
+      "weaponsmenu.resetinfo.reset": "Your free set has been reset, choose a new one next round!",
+      "weaponsmenu.resetinfo.info": "Want another set? Use {orange}!vwmenu{default} to choose a new one next round.",
+      "pmm_vip.value.Health": "{0} HP",
+      "pmm_vip.value.Armor": "{0} armor",
+      "pmm_vip.value.Speed": "x{0}",
+      "pmm_vip.value.Gravity": "x{0}",
+      "pmm_vip.value.Money": "${0}",
+      "pmm_vip.value.Jumps": "+{0}",
+      "pmm_vip.value.Vampirism": "{0}%",
+      "pmm_vip.value.DamageMultiplier": "x{0}",
+      "pmm_vip.value.HealthRegen": "+{0} HP",
+      "pmm_vip.value.ArmorRegen": "+{0}",
+      "pmm_vip.value.Healthshot": "{0} pcs",
+      "pmm_vip.value.exp_multiplier": "x{0}"
+    }
+  }
+```
+
+Keys:
+- feature keys (`Health`, `ShowDamage`, `WeaponsMenu` …) — tile names;
+- `fov.*`, `tag.*`, `bhop.*`, `respawn.*`, `vip.*`, `viptest.*`, `buyteamweapon.*`, `weaponsmenu.*` — texts of VIP modules
+  in menus and chat (`{0}` = value from the module, `{blue}`, `{red}`, `{green}`, `{orange}`, `{default}` = chat colours);
+- `pmm_vip.*` — panel texts, `pmm_vip.value.<Feature>` — value label.
+
+These module keys win over the VIPCore `lang` files. Module texts use the language CSS has at that moment
+(the server language in timers, e.g. the WeaponsMenu menu on spawn); set `ModuleLanguage` (`"ru"`) to force one.
 
 #### What is intercepted
 | What | How |
@@ -93,7 +309,8 @@ Language = the player's CS2 language; if a key is missing — `en`, then `Paint.
 | "Bhop: Enabled" in chat | status line / `Notify` toast (panorama only) |
 | Fov, Tag | value list right inside `!vip` (panorama only), the new value shows at once |
 | Module sub menus through `CreateMenu` | MenuManager menu with "Back" to `!vip` |
-| Modules with their own `ChatMenu` / `CenterHtmlMenu` (VIP_Tag, VIP_WeaponsMenu) | CSS hooks `ChatMenu.Open`, `CenterHtmlMenu.Open`, `MenuManager.OpenChatMenu/OpenCenterHtmlMenu`, only for plugins from `InterceptPlugins` |
+| Modules with their own `ChatMenu` / `CenterHtmlMenu` (VIP_Tag, VIP_WeaponsMenu) | CSS hooks `ChatMenu.Open`, `CenterHtmlMenu.Open`, `MenuManager.OpenChatMenu/OpenCenterHtmlMenu` and, as a fallback, `ChatMenuInstance/CenterHtmlMenuInstance.Display`; only for plugins from `InterceptPlugins` |
+| Module texts (`GetTranslatedText`) | from `MenuManager_Modules_Translation.json` when the key is there |
 
 Menus of other plugins are not touched: a CSS menu is intercepted only when a plugin from `InterceptPlugins` opened it.
 
@@ -112,6 +329,11 @@ Menus of other plugins are not touched: a CSS menu is intercepted only when a pl
 | `ExitButton` | `true` | exit button |
 | `StripColors` | `true` | remove chat colour codes from titles and rows (not for ChatMenu) |
 | `Debug` | `false` | log opens / intercepts |
+| `SkipDisabledMenus` | `true` | a module menu where every row is disabled is not opened (WeaponsMenu before the round of its sets) |
+| `ModuleLanguage` | `""` | language of module texts from the translations file: empty = current CSS language, or e.g. `ru` |
+| `AutoCloseSeconds` | `20` | module menus that pop up by themselves (WeaponsMenu on spawn) close after N seconds, countdown in the panel. `0` = off |
+| `AutoCloseVipSeconds` | `0` | the same for `!vip` and its sub menus. `0` = off |
+| `AutoCloseWarnSeconds` | `5` | the countdown turns red for the last N seconds |
 | `Paint.Enabled` | `true` | own VIP panorama (needs the addon) |
 | `Paint.Position` | `Center` | `Left` / `Center` / `Right` |
 | `Paint.GroupPalette` | VIPBRONZE/SILVER/GOLD | group → palette from `Paint.Theme.Palettes`. Not listed — by the group name, else `DefaultPalette` |
@@ -124,7 +346,7 @@ Menus of other plugins are not touched: a CSS menu is intercepted only when a pl
 
 ## Русский
 
-### PMM_VIPCore 0.1.1 — установка
+### PMM_VIPCore 0.1.3 — установка
 
 Мост: меню оригинального VIPCore (thesamefabius, v1.3.3 / релиз recompile3) показываются через PanoramaMenuManager.
 VIPCore и модули не пересобираются — всё через Harmony, как в PMM_GG1MapChooser.
@@ -169,7 +391,8 @@ panorama/styles/custom_game/pmm_vip_theme.css
   значение со списком / «▶ ИСП.» / замок «Нет доступа»;
 - клик по Fov / Tag — выбор значения плитками 4×4;
 - подменю модулей (WeaponsMenu и т.п.) — списком по 8 строк, с «Назад»;
-- статус переключения внизу слева, листание внизу по центру; страница запоминается для каждого меню.
+- статус переключения внизу слева, листание внизу по центру, отсчёт автозакрытия внизу справа; страница запоминается для каждого меню;
+- собственное меню модуля (WeaponsMenu) закрывается после выбора и не имеет «Назад», как в CSS.
 
 Генератор разметки: `tools/gen_layout.py` (иконки, палитры, число плиток —
 id и классы должны совпадать с `Paint.cs`).
@@ -197,12 +420,227 @@ id и классы должны совпадать с `Paint.cs`).
 #### Названия и тексты (MenuManager_Modules_Translation.json)
 При первом запуске плагин добавляет раздел `PMM_VIPCore` (ru / en) в
 `configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` — тот же файл, что у MenuManager.
-Раздел добавляется один раз, дальше файл ваш; изменения подхватываются на лету.
+Недостающие ключи дописываются при каждом запуске, существующие не трогаются; изменения подхватываются на лету.
 - ключ функции (`Health`, `ShowDamage`, `SoundDMG`, `Tag` …) — название плитки;
 - `tag.Disable`, `fov.Disable` и любые ключи модулей — подписи в списках выбора;
 - `pmm_vip.*` — тексты панели (`pmm_vip.back`, `pmm_vip.enabled`, `pmm_vip.forever` …);
 - `pmm_vip.title` — заголовок `!vip` (`{0}` = группа), `pmm_vip.value.<Функция>` — подпись значения (`{0} HP`).
 Язык — язык игрока в CS2 (`!lang`), если ключа нет — `en`, затем `Paint.Texts` / `Paint.ValueFormat` конфига.
+
+#### Переводы, которые нужно дописать вручную (только если не появились сами)
+При каждом запуске плагин сам дописывает недостающие ключи раздела `PMM_VIPCore` в
+`configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json` (уже существующие ключи не меняются).
+**Только если** раздел или часть ключей не появились (файл только для чтения, ошибка в JSON, в логе сервера
+`Translations: could not add …`), добавьте этот блок в корневой объект файла вручную
+(не забудьте запятую после предыдущего раздела):
+
+```json
+"PMM_VIPCore": {
+    "ru": {
+      "pmm_vip.brand": "VIP",
+      "pmm_vip.forever": "навсегда",
+      "pmm_vip.until": "до",
+      "pmm_vip.days_left": "· {0} дн.",
+      "pmm_vip.enabled": "Включено",
+      "pmm_vip.disabled": "Выключено",
+      "pmm_vip.no_access": "Нет доступа",
+      "pmm_vip.use": "▶ ИСП.",
+      "pmm_vip.back": "‹ НАЗАД",
+      "pmm_vip.pick_hint": "Выбери значение",
+      "pmm_vip.page": "{0} / {1}",
+      "pmm_vip.title": "VIP меню — {0}",
+      "pmm_vip.closes_in": "Закроется через {0} с",
+      "Antiflash": "Анти-флеш",
+      "Armor": "Броня",
+      "ArmorRegen": "Реген брони",
+      "Bhop": "Банихоп",
+      "BuyTeamWeapon": "Оружие другой команды",
+      "CustomDefaultAmmo": "Патроны",
+      "DamageMultiplier": "Множитель урона",
+      "DecoyTp": "Телепорт-граната",
+      "DefuseKit": "Набор сапёра",
+      "Defuser": "Набор сапёра",
+      "FastReload": "Быстрая перезарядка",
+      "Fov": "Поле зрения (FOV)",
+      "Gravity": "Гравитация",
+      "Grenades": "Гранаты",
+      "Health": "Здоровье",
+      "HealthRegen": "Реген здоровья",
+      "Healthshot": "Медшприц",
+      "InfiniteAmmo": "Бесконечные патроны",
+      "Items": "Предметы",
+      "Jumps": "Доп. прыжки",
+      "Killscreen": "Эффект убийства",
+      "Money": "Деньги",
+      "NoFallDamage": "Без урона от падения",
+      "RainbowModel": "Радужная модель",
+      "ResetDeaths": "Сброс смертей",
+      "Respawn": "Возрождение",
+      "ShowDamage": "Показ урона",
+      "SmokeColor": "Цветной дым",
+      "SoundDMG": "Звук попадания",
+      "Speed": "Скорость",
+      "Tag": "Клан-тег",
+      "TeammatesHeal": "Лечение союзников",
+      "Vampirism": "Вампиризм",
+      "WeaponsMenu": "Меню оружия",
+      "Zeus": "Zeus",
+      "endurance": "Выносливость",
+      "exp_multiplier": "Множитель опыта",
+      "fastdefuse": "Быстрое разминирование",
+      "fastplant": "Быстрая установка",
+      "flags": "Флаги",
+      "fov.Disable": "Выкл.",
+      "tag.Disable": "Без тега",
+      "fov.On": "Вы установили {blue}FOV {default}на {red}{0}",
+      "fov.Off": "Вы выключили {blue}FOV",
+      "tag.On": "Вы установили {blue}тег {default}на {red}{0}",
+      "tag.Off": "Вы выключили {blue}тег",
+      "bhop.Activated": "Банихоп активирован!",
+      "bhop.TimeToActivation": "Банихоп будет активен через {red}{0}{default} сек.",
+      "respawn.Limit": "Лимит возрождений исчерпан!",
+      "respawn.InTeam": "Вы должны быть в команде!",
+      "respawn.IsAlive": "Вы должны быть мертвы!",
+      "respawn.Success": "Вы успешно возродились!",
+      "vip.NoAccess": "У вас нет доступа к этой команде!",
+      "vip.AlreadyVipPrivileges": "У вас уже есть VIP-привилегия.",
+      "vip.ResetDeaths": "Ваши смерти сброшены!",
+      "viptest.YouCanNoLongerTakeTheVip": "Вы больше не можете взять VIP-Test",
+      "viptest.RetakenThrough": "Взять VIP-Test повторно можно через: {0}",
+      "viptest.SuccessfullyPassed": "Вы взяли VIP-Test! Заканчивается через: {0}",
+      "buyteamweapon.round_start": "Можно купить оружие другой команды: {green}{0}",
+      "buyteamweapon.in_buy_zone": "Вы должны быть в зоне закупки!",
+      "buyteamweapon.no_money": "Недостаточно денег!",
+      "weaponsmenu.title": "Выберите набор оружия",
+      "weaponsmenu.fromround": "[С {0} раунда]",
+      "weaponsmenu.wanttosave": "Сохранить этот набор?",
+      "weaponsmenu.wanttosave.yes": "Да",
+      "weaponsmenu.wanttosave.no": "Нет",
+      "weaponsmenu.saved": "Набор сохранён, вы будете получать его автоматически!",
+      "weaponsmenu.notsaved": "Набор не сохранён, в следующем раунде можно выбрать снова.",
+      "weaponsmenu.resetinfo.reset": "Набор сброшен, выберите новый в следующем раунде!",
+      "weaponsmenu.resetinfo.info": "Хотите сменить набор? Команда {orange}!vwmenu{default} — выбор в следующем раунде.",
+      "pmm_vip.value.Health": "{0} HP",
+      "pmm_vip.value.Armor": "{0} брони",
+      "pmm_vip.value.Speed": "x{0}",
+      "pmm_vip.value.Gravity": "x{0}",
+      "pmm_vip.value.Money": "${0}",
+      "pmm_vip.value.Jumps": "+{0}",
+      "pmm_vip.value.Vampirism": "{0}%",
+      "pmm_vip.value.DamageMultiplier": "x{0}",
+      "pmm_vip.value.HealthRegen": "+{0} HP",
+      "pmm_vip.value.ArmorRegen": "+{0}",
+      "pmm_vip.value.Healthshot": "{0} шт.",
+      "pmm_vip.value.exp_multiplier": "x{0}"
+    },
+    "en": {
+      "pmm_vip.brand": "VIP",
+      "pmm_vip.forever": "forever",
+      "pmm_vip.until": "until",
+      "pmm_vip.days_left": "· {0} d.",
+      "pmm_vip.enabled": "Enabled",
+      "pmm_vip.disabled": "Disabled",
+      "pmm_vip.no_access": "No access",
+      "pmm_vip.use": "▶ USE",
+      "pmm_vip.back": "‹ BACK",
+      "pmm_vip.pick_hint": "Pick a value",
+      "pmm_vip.page": "{0} / {1}",
+      "pmm_vip.title": "VIP menu — {0}",
+      "pmm_vip.closes_in": "Closes in {0}s",
+      "Antiflash": "Anti-Flash",
+      "Armor": "Armor",
+      "ArmorRegen": "Armor Regen",
+      "Bhop": "BunnyHop",
+      "BuyTeamWeapon": "Enemy Team Weapons",
+      "CustomDefaultAmmo": "Ammo",
+      "DamageMultiplier": "Damage Multiplier",
+      "DecoyTp": "Teleport Grenade",
+      "DefuseKit": "Defuse Kit",
+      "Defuser": "Defuse Kit",
+      "FastReload": "Fast Reload",
+      "Fov": "Field of View",
+      "Gravity": "Gravity",
+      "Grenades": "Grenades",
+      "Health": "Health",
+      "HealthRegen": "Health Regen",
+      "Healthshot": "Healthshot",
+      "InfiniteAmmo": "Infinite Ammo",
+      "Items": "Items",
+      "Jumps": "Extra Jumps",
+      "Killscreen": "Kill Effect",
+      "Money": "Money",
+      "NoFallDamage": "No Fall Damage",
+      "RainbowModel": "Rainbow Model",
+      "ResetDeaths": "Reset Deaths",
+      "Respawn": "Respawn",
+      "ShowDamage": "Show Damage",
+      "SmokeColor": "Smoke Color",
+      "SoundDMG": "Hit Sound",
+      "Speed": "Speed",
+      "Tag": "Clan Tag",
+      "TeammatesHeal": "Heal Teammates",
+      "Vampirism": "Vampirism",
+      "WeaponsMenu": "Weapons Menu",
+      "Zeus": "Zeus",
+      "endurance": "Endurance",
+      "exp_multiplier": "XP Multiplier",
+      "fastdefuse": "Fast Defuse",
+      "fastplant": "Fast Plant",
+      "flags": "Flags",
+      "fov.Disable": "Off",
+      "tag.Disable": "No tag",
+      "fov.On": "You have set {blue}FOV {default}to {red}{0}",
+      "fov.Off": "You've disabled the {blue}FOV",
+      "tag.On": "You have set {blue}Tag {default}to {red}{0}",
+      "tag.Off": "You've disabled the {blue}Tag",
+      "bhop.Activated": "BunnyHop activated!",
+      "bhop.TimeToActivation": "BunnyHop will be active in {red}{0}{default}s.",
+      "respawn.Limit": "Respawn limit reached!",
+      "respawn.InTeam": "You must be in a team!",
+      "respawn.IsAlive": "You must be dead!",
+      "respawn.Success": "Respawn successful!",
+      "vip.NoAccess": "You don't have access to this command!",
+      "vip.AlreadyVipPrivileges": "You already have VIP privileges.",
+      "vip.ResetDeaths": "Your deaths are reset!",
+      "viptest.YouCanNoLongerTakeTheVip": "You can no longer take the VIP Test.",
+      "viptest.RetakenThrough": "The VIP test can be retaken in: {0}.",
+      "viptest.SuccessfullyPassed": "You have taken the VIP test! Ends in: {0}.",
+      "buyteamweapon.round_start": "You can buy the other team's weapons: {green}{0}",
+      "buyteamweapon.in_buy_zone": "You must be in the buy zone!",
+      "buyteamweapon.no_money": "Not enough money!",
+      "weaponsmenu.title": "Select weapons package",
+      "weaponsmenu.fromround": "[From round {0}]",
+      "weaponsmenu.wanttosave": "Do you want to save this set?",
+      "weaponsmenu.wanttosave.yes": "Yes",
+      "weaponsmenu.wanttosave.no": "No",
+      "weaponsmenu.saved": "Your free set has been saved, you will receive it when possible!",
+      "weaponsmenu.notsaved": "Your free set was not saved, you can choose a new one next round.",
+      "weaponsmenu.resetinfo.reset": "Your free set has been reset, choose a new one next round!",
+      "weaponsmenu.resetinfo.info": "Want another set? Use {orange}!vwmenu{default} to choose a new one next round.",
+      "pmm_vip.value.Health": "{0} HP",
+      "pmm_vip.value.Armor": "{0} armor",
+      "pmm_vip.value.Speed": "x{0}",
+      "pmm_vip.value.Gravity": "x{0}",
+      "pmm_vip.value.Money": "${0}",
+      "pmm_vip.value.Jumps": "+{0}",
+      "pmm_vip.value.Vampirism": "{0}%",
+      "pmm_vip.value.DamageMultiplier": "x{0}",
+      "pmm_vip.value.HealthRegen": "+{0} HP",
+      "pmm_vip.value.ArmorRegen": "+{0}",
+      "pmm_vip.value.Healthshot": "{0} pcs",
+      "pmm_vip.value.exp_multiplier": "x{0}"
+    }
+  }
+```
+
+Ключи:
+- ключи функций (`Health`, `ShowDamage`, `WeaponsMenu` …) — названия плиток;
+- `fov.*`, `tag.*`, `bhop.*`, `respawn.*`, `vip.*`, `viptest.*`, `buyteamweapon.*`, `weaponsmenu.*` — тексты VIP-модулей
+  в меню и в чате (`{0}` — значение от модуля, `{blue}`, `{red}`, `{green}`, `{orange}`, `{default}` — цвета чата);
+- `pmm_vip.*` — тексты панели, `pmm_vip.value.<Функция>` — подпись значения.
+
+Ключи модулей важнее файлов `lang` VIPCore. Тексты модулей берутся на языке, который CSS использует в этот момент
+(в таймерах — язык сервера, например меню WeaponsMenu при спавне); `ModuleLanguage` (`"ru"`) задаёт язык принудительно.
 
 #### Что перехватывается
 | Что | Как |
@@ -212,7 +650,8 @@ id и классы должны совпадать с `Paint.cs`).
 | «Bhop: Включено» в чат | тост `Notify` (только панорама) |
 | Fov, Tag | выпадающий список `AddSelect` прямо в `!vip` (только панорама), новое значение видно сразу |
 | Подменю модулей через `CreateMenu` (Fov в чат-режиме и т.п.) | меню MenuManager с кнопкой «Назад» в `!vip` |
-| Модули с собственным `ChatMenu` / `CenterHtmlMenu` (VIP_Tag, VIP_WeaponsMenu) | хуки `ChatMenu.Open`, `CenterHtmlMenu.Open`, `MenuManager.OpenChatMenu/OpenCenterHtmlMenu` CSS, только для плагинов из `InterceptPlugins` |
+| Модули с собственным `ChatMenu` / `CenterHtmlMenu` (VIP_Tag, VIP_WeaponsMenu) | хуки `ChatMenu.Open`, `CenterHtmlMenu.Open`, `MenuManager.OpenChatMenu/OpenCenterHtmlMenu` CSS и запасной `ChatMenuInstance/CenterHtmlMenuInstance.Display`; только для плагинов из `InterceptPlugins` |
+| Тексты модулей (`GetTranslatedText`) | из `MenuManager_Modules_Translation.json`, если там есть ключ |
 
 Меню других плагинов не трогаются: CSS-меню перехватывается только если его открыл плагин из `InterceptPlugins`.
 
@@ -231,6 +670,11 @@ id и классы должны совпадать с `Paint.cs`).
 | `ExitButton` | `true` | кнопка выхода |
 | `StripColors` | `true` | убрать цветовые коды чата из заголовков и строк (кроме ChatMenu) |
 | `Debug` | `false` | лог открытий / перехватов |
+| `SkipDisabledMenus` | `true` | меню модуля, где все строки недоступны, не открывается (WeaponsMenu до раунда наборов) |
+| `ModuleLanguage` | `""` | язык текстов модулей из файла переводов: пусто — текущий язык CSS, или например `ru` |
+| `AutoCloseSeconds` | `20` | всплывающие меню модулей (WeaponsMenu при спавне) закрываются через N секунд, отсчёт в панели. `0` — выкл. |
+| `AutoCloseVipSeconds` | `0` | то же для `!vip` и его подменю. `0` — выкл. |
+| `AutoCloseWarnSeconds` | `5` | последние N секунд отсчёт красный |
 | `Paint.Enabled` | `true` | своя VIP-панорама (нужен аддон) |
 | `Paint.Position` | `Center` | `Left` / `Center` / `Right` |
 | `Paint.GroupPalette` | VIPBRONZE/SILVER/GOLD | группа → палитра из `Paint.Theme.Palettes`. Нет в списке — по названию группы, иначе `DefaultPalette` |

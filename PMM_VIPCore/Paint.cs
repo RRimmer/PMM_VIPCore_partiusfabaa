@@ -357,6 +357,7 @@ public partial class Plugin : IPmmMenuPainter
         }
 
         Cls(player, RootId, "has-pages", pages > 1);
+        DrawTimer(player);
         Var(player, RootId, "vip_page", Fmt(T(player, "page", Tx.Page), page + 1, pages));
         for (int i = 0; i < Dots; i++)
         {
@@ -472,6 +473,27 @@ public partial class Plugin : IPmmMenuPainter
             Cls(player, id, "dis", e.Disabled);
             Var(player, id, "vlr" + i, e.Label);
         }
+    }
+
+    // Countdown in the footer (AutoCloseSeconds / AutoCloseVipSeconds).
+    private void DrawTimer(CCSPlayerController player)
+    {
+        var st = State(player.Slot);
+        int left = st.CloseAt == default ? 0 : (int)Math.Ceiling((st.CloseAt - DateTime.UtcNow).TotalSeconds);
+        if (left > 0) PaintTimer(player, left);
+        else
+        {
+            Cls(player, RootId, "has-timer", false);
+            Cls(player, RootId, "timer-low", false);
+        }
+    }
+
+    private void PaintTimer(CCSPlayerController player, int left)
+    {
+        if (player.Slot is < 0 or >= 65 || !_paint[player.Slot].Open || _vipLayout is not { IsValid: true }) return;
+        Var(player, RootId, "vip_timer", Fmt(T(player, "closes_in", Tx.ClosesIn), left));
+        Cls(player, RootId, "timer-low", left <= Config.AutoCloseWarnSeconds);
+        Cls(player, RootId, "has-timer", true);
     }
 
     private void Hide(CCSPlayerController player)
