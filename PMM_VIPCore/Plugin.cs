@@ -15,7 +15,7 @@ namespace PMM_VIPCore;
 public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
 {
     public override string ModuleName => "PMM_VIPCore";
-    public override string ModuleVersion => "0.1.3";
+    public override string ModuleVersion => "0.1.4";
     public override string ModuleAuthor => "Rimmer";
     public override string ModuleDescription => "Shows VIPCore (thesamefabius) menus through PanoramaMenuManager (Harmony bridge)";
 
@@ -27,6 +27,8 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
     {
         config.InterceptPlugins ??= new();
         config.InlineSelectFeatures ??= new();
+        config.WeaponsMenu ??= new WeaponsMenuOptions();
+        config.WeaponsMenu.Commands ??= new();
         var paint = config.Paint ??= new PaintOptions();
         paint.Texts ??= new PaintTexts();
         paint.Theme ??= new ThemeOptions();
@@ -62,6 +64,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         _tr.EnsureSection();
         WriteThemeCss();
         PaintLoad();
+        WmLoad();
         AddTimer(0.25f, AutoCloseTick, CounterStrikeSharp.API.Modules.Timers.TimerFlags.REPEAT);
     }
 
@@ -98,10 +101,12 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         _forceType = Config.ForceMenuType != "" && Enum.TryParse<MenuType>(Config.ForceMenuType, true, out var t) ? t : null;
         Patch();
         if (Active) RegisterPainter();
+        WmHookDigits();
     }
 
     public override void Unload(bool hotReload)
     {
+        WmUnhookDigits();
         UnregisterPainter();
         foreach (var p in Utilities.GetPlayers())
             if (p.IsValid && IsOpen(p)) Hide(p);
@@ -223,6 +228,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         info.ReplyToCommand($"[PMM_VIP] css hooks={_cssHooks} intercept=[{string.Join(", ", Config.InterceptPlugins)}] inline=[{string.Join(", ", Config.InlineSelectFeatures)}]");
         info.ReplyToCommand($"[PMM_VIP] open menus: {_slots.Count(x => x.Value.Current != null)}");
         info.ReplyToCommand($"[PMM_VIP] translations: {_tr?.FilePath ?? "-"} ({_tr?.Languages ?? 0} languages)");
+        info.ReplyToCommand($"[PMM_VIP] weaponsmenu: enabled={Config.WeaponsMenu.Enabled} module={(WmFeature() != null ? "found" : "not found")} digits={_digitsApi} players={_wmPrefs.Count}");
         info.ReplyToCommand($"[PMM_VIP] panorama: enabled={Config.Paint.Enabled} painter={_registry != null} layout={(_vipLayout is { IsValid: true } ? "ok" : "none")} open={_paint.Count(x => x.Open)}");
     }
 
@@ -238,7 +244,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
     }
 
     // First caller outside CSS / Harmony / this plugin / the BCL: that is the plugin that opened the menu.
-    internal static string? CallerAssembly()
+    internal static string? CallerAssembly(string? skip = null)
     {
         var own = typeof(Plugin).Assembly;
         var css = typeof(ChatMenu).Assembly;
@@ -248,7 +254,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
             var asm = trace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
             if (asm == null || asm.IsDynamic || asm == own || asm == css) continue;
             string? name = asm.GetName().Name;
-            if (name == null || name == "0Harmony" || name.StartsWith("MonoMod", StringComparison.Ordinal) ||
+            if (name == null || name == skip || name == "0Harmony" || name.StartsWith("MonoMod", StringComparison.Ordinal) ||
                 name.StartsWith("System", StringComparison.Ordinal) || name.StartsWith("Microsoft", StringComparison.Ordinal))
                 continue;
             return name;

@@ -4,6 +4,18 @@
 
 ## English
 
+### 0.1.4 — 2026-10-19
+- WeaponsMenu (VIP_WeaponsMenu) in a compact panel, also when the module builds its menu with `VipApi.CreateMenu` (VIPCore 1.4.x) (440 px, 6 rows, `WeaponsMenu.Position`, left by default) with a gear ⚙
+  in the header. The gear and **`!swm`** open the player's settings:
+  - "Ask every time whether to save the set?" (off — once per map, then "Save set «X»" in the settings);
+  - "Open the weapon set menu automatically" (off — "Pick a set now" in the settings);
+  - pick a set now, save the last set, delete the saved set;
+  - menu control (a list, the mode is picked directly): Panorama mouse / Panorama WASD (W/S, E, A/D, R) / Panorama digits (1–6, 7, 8/9, 0; PMM Core 1.2.05,
+    number keys check of MenuManager on the first pick). Key hints under the rows.
+- Settings are kept per SteamID in `plugins/PMM_VIPCore/weaponsmenu_players.json`. New config section `WeaponsMenu`.
+- Panel rows can show a switch and a value; new texts `pmm_vip.wm.*`, `pmm_vip.keys_*` (added automatically).
+- `css_pmm_vip` shows the WeaponsMenu state. The addon needs the new `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
+
 ### 0.1.3 — 2026-10-11
 - A module's own menu (WeaponsMenu) closes after a pick, as the CSS chat / center menu does. Its follow-up menu
   ("save this set?") has no "Back" to the weapons list any more. Before, the panel stayed open and the weapons
@@ -55,6 +67,18 @@
 - Server command `css_pmm_vip [repatch]`.
 
 ## Русский
+
+### 0.1.4 — 2026-10-19
+- WeaponsMenu (VIP_WeaponsMenu) в компактной панели, в том числе когда модуль строит меню через `VipApi.CreateMenu` (VIPCore 1.4.x) (440 px, 6 строк, `WeaponsMenu.Position`, по умолчанию слева) с шестерёнкой ⚙
+  в шапке. Шестерёнка и **`!swm`** открывают настройки игрока:
+  - «Спрашивать каждый раз о сохранении набора?» (выкл. — один раз за карту, потом «Сохранить комплект «X»» в настройках);
+  - «Автоматический вызов меню выбора комплекта оружий» (выкл. — «Выбрать комплект сейчас» в настройках);
+  - выбрать комплект сейчас, сохранить последний комплект, удалить сохранённый;
+  - вид меню (список, режим выбирается сразу): Панорама мышка / Панорама WASD (W/S, E, A/D, R) / Панорама цифры (1–6, 7, 8/9, 0; PMM Core 1.2.05,
+    при первом выборе — проверка цифр MenuManager). Подсказка по клавишам под строками.
+- Настройки хранятся по SteamID в `plugins/PMM_VIPCore/weaponsmenu_players.json`. Новая секция конфига `WeaponsMenu`.
+- Строки панели умеют показывать тумблер и значение; новые тексты `pmm_vip.wm.*`, `pmm_vip.keys_*` (добавляются сами).
+- `css_pmm_vip` показывает состояние WeaponsMenu. В аддон нужны новые `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
 
 ### 0.1.3 — 2026-10-11
 - Собственное меню модуля (WeaponsMenu) закрывается после выбора, как чат / центр-меню CSS. У следующего меню

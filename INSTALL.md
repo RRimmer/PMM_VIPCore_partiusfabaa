@@ -4,7 +4,7 @@
 
 ## English
 
-### PMM_VIPCore 0.1.3 — install
+### PMM_VIPCore 0.1.4 — install
 
 Bridge: menus of the original VIPCore (thesamefabius, v1.3.3 / release recompile3) are shown through PanoramaMenuManager.
 VIPCore and its modules are not rebuilt — everything goes through Harmony, as in PMM_GG1MapChooser.
@@ -12,7 +12,7 @@ VIPCore and its modules are not rebuilt — everything goes through Harmony, as 
 #### Requirements
 - CounterStrikeSharp 1.0.376 or newer (.NET 10)
 - VIPCore (original `plugins/VIPCore` + `shared/VipCoreApi`) and any `VIP_*` modules
-- MenuManagerCS2 (PanoramaMenuManager) 1.2.03 and its client addon
+- MenuManagerCS2 (PanoramaMenuManager) 1.2.03 and its client addon (WeaponsMenu "Panorama digits" mode: 1.2.05)
 
 VIP_Fov and VIP_Tag must be the **original** builds (thesamefabius release), not the ones from the PMM fork: the fork
 builds call `VipFeatureBase.OnMenuSelect`, which the original VipCoreApi does not have (`MissingMethodException`).
@@ -43,18 +43,43 @@ panorama/styles/custom_game/pmm_vip_theme.css
 Players have to reconnect after a new addon version.
 
 The panel is drawn for players who picked **PanoramaMenu** (mouse) in `!menu`. Other menu types (WASD, chat, CS:GO)
-get the standard MenuManager menu. Without the addon on the client nothing appears: set `Paint.Enabled: false` then.
+get the standard MenuManager menu. Exception: the WeaponsMenu panel is shown to everyone (it has its own mouse / WASD / digits
+modes, see below). Without the addon on the client nothing appears: set `Paint.Enabled: false` then.
 
 On screen:
 - header: nickname, VIP group (colour per group), VIP expiry ("until 12.11.2026 · 34 d." / "forever");
 - 3×4 tiles (12 per page): icon, name, the value from `vip.json` ("120 HP", "x1.2"), a switch /
   a value with a list / "▶ USE" / a lock "No access";
 - a click on Fov / Tag opens a 4×4 value picker;
-- module sub menus (WeaponsMenu etc.) are an 8-row list with "Back";
+- module sub menus are an 8-row list with "Back"; WeaponsMenu has its own compact panel (below);
 - status line bottom left, pages bottom centre, auto-close countdown bottom right; the page is remembered per menu;
 - a module's own menu (WeaponsMenu) closes after a pick and has no "Back", as in CSS.
 
 Layout generator: `tools/gen_layout.py` (icons, palettes, tile count — ids and classes must match `Paint.cs`).
+
+#### WeaponsMenu (VIP_WeaponsMenu)
+The weapons menu of the original VIP_WeaponsMenu (daffyy) gets a compact panel (6 rows, `WeaponsMenu.Position`)
+with a gear ⚙ in the header, left of ×. The gear and the chat command **`!swm`** open the settings
+(only for VIP players with the `WeaponsMenu` feature):
+
+| Row | What it does |
+|---|---|
+| Ask every time whether to save the set? | on — "Save this set?" after every pick; off — asked once per map, later saving is done here |
+| Open the weapon set menu automatically | off — the menu does not pop up on spawn; take a set with "Pick a set now" |
+| Pick a set now | opens the weapons list (the module checks alive / buy zone / buy time / round itself) |
+| Save set «X» | saves the set taken last (when it was not saved in the prompt) |
+| Delete the saved set | the weapons menu shows up again on the next spawn (the same as the module's `!vwmenu`) |
+| Menu control | opens the list Panorama mouse / Panorama WASD / Panorama digits, a pick sets the mode at once. Digits: the first pick runs the number keys check |
+
+Controls of the panel:
+- mouse — clicks (the mouse is captured while the panel is open);
+- WASD — W/S move, E take, A/D page, R settings (in the settings: back / close); the mouse stays with the game;
+- digits — 1–6 take, 7 settings / back, 8/9 page, 0 close. Needs PMM Core 1.2.05: the first switch opens the
+  MenuManager number keys check (the bind line is printed to the console), the mode is set after it is passed.
+
+Player settings are kept per SteamID in `plugins/PMM_VIPCore/weaponsmenu_players.json`. Defaults for new players —
+`WeaponsMenu.DefaultAskSave`, `DefaultEveryRound`, `DefaultMode` (`Auto` = from the player's `!menu`).
+The panel needs the 0.1.4 addon files (`pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`): rebuild the addon.
 
 #### Colours (`Paint.Theme`)
 Panorama cannot take colours from the server, so the colours live in a separate file `pmm_vip_theme.css`:
@@ -109,6 +134,37 @@ On every start the plugin adds the missing keys of the `PMM_VIPCore` section to
       "pmm_vip.page": "{0} / {1}",
       "pmm_vip.title": "VIP меню — {0}",
       "pmm_vip.closes_in": "Закроется через {0} с",
+      "pmm_vip.wm.settings_title": "Настройки меню оружия",
+      "pmm_vip.wm.ask_each_time": "Спрашивать каждый раз о сохранении набора?",
+      "pmm_vip.wm.auto_menu": "Автоматический вызов меню выбора комплекта оружий",
+      "pmm_vip.wm.mode_title": "Вид меню",
+      "pmm_vip.wm.mode_need_check": "нужна проверка цифр",
+      "pmm_vip.wm.mode_need_core": "Нужен PMM Core 1.2.05 на сервере",
+      "pmm_vip.wm.open_now": "Выбрать комплект сейчас",
+      "pmm_vip.wm.save": "Сохранить комплект",
+      "pmm_vip.wm.save_last": "Сохранить комплект «{0}»",
+      "pmm_vip.wm.forget": "Удалить сохранённый комплект",
+      "pmm_vip.wm.mode": "Вид меню",
+      "pmm_vip.wm.mode_mouse": "Панорама мышка",
+      "pmm_vip.wm.mode_wasd": "Панорама WASD",
+      "pmm_vip.wm.mode_digits": "Панорама цифры",
+      "pmm_vip.wm.mode_set": "Вид меню: {0}",
+      "pmm_vip.wm.saved": "Комплект сохранён и будет выдаваться автоматически",
+      "pmm_vip.wm.saved_auto": "Комплект сохранён и выдаётся автоматически. Удалите его, чтобы выбрать другой",
+      "pmm_vip.wm.already_saved": "Комплект уже сохранён",
+      "pmm_vip.wm.nothing_to_save": "Сначала возьмите комплект в меню оружия",
+      "pmm_vip.wm.nothing_saved": "Нет сохранённого комплекта",
+      "pmm_vip.wm.forgot": "Сохранённый комплект удалён",
+      "pmm_vip.wm.not_now": "Сейчас взять комплект нельзя: вы мертвы, вне зоны закупки, время закупки вышло или комплект ещё недоступен",
+      "pmm_vip.wm.unavailable": "VIP_WeaponsMenu не загружен",
+      "pmm_vip.wm.no_access": "{red}[VIP]{default} Меню оружия вам недоступно",
+      "pmm_vip.wm.hint": "{gold}[VIP]{default} Меню оружия и сохранение комплекта: {green}{0}",
+      "pmm_vip.wm.keys_check": "{gold}[VIP]{default} Нажмите по очереди 1 … 0. Строка с биндами — в консоли",
+      "pmm_vip.wm.keys_fail": "Проверка цифр не пройдена, вид меню не изменён",
+      "pmm_vip.keys_wasd": "W/S — выбор · E — взять · A/D — стр. · R — настройки",
+      "pmm_vip.keys_wasd_set": "W/S — выбор · E — изменить · R — назад",
+      "pmm_vip.keys_digits": "1–6 — взять · 7 — настройки · 8/9 — стр. · 0 — закрыть",
+      "pmm_vip.keys_digits_set": "1–6 — изменить · 7 — назад · 0 — закрыть",
       "Antiflash": "Анти-флеш",
       "Armor": "Броня",
       "ArmorRegen": "Реген брони",
@@ -206,6 +262,37 @@ On every start the plugin adds the missing keys of the `PMM_VIPCore` section to
       "pmm_vip.page": "{0} / {1}",
       "pmm_vip.title": "VIP menu — {0}",
       "pmm_vip.closes_in": "Closes in {0}s",
+      "pmm_vip.wm.settings_title": "Weapons menu settings",
+      "pmm_vip.wm.ask_each_time": "Ask every time whether to save the set?",
+      "pmm_vip.wm.auto_menu": "Open the weapon set menu automatically",
+      "pmm_vip.wm.mode_title": "Menu control",
+      "pmm_vip.wm.mode_need_check": "keys check needed",
+      "pmm_vip.wm.mode_need_core": "Needs PMM Core 1.2.05 on the server",
+      "pmm_vip.wm.open_now": "Pick a set now",
+      "pmm_vip.wm.save": "Save the set",
+      "pmm_vip.wm.save_last": "Save set «{0}»",
+      "pmm_vip.wm.forget": "Delete the saved set",
+      "pmm_vip.wm.mode": "Menu control",
+      "pmm_vip.wm.mode_mouse": "Panorama mouse",
+      "pmm_vip.wm.mode_wasd": "Panorama WASD",
+      "pmm_vip.wm.mode_digits": "Panorama digits",
+      "pmm_vip.wm.mode_set": "Menu control: {0}",
+      "pmm_vip.wm.saved": "Set saved, it will be given automatically",
+      "pmm_vip.wm.saved_auto": "A set is saved and given automatically. Delete it to pick another one",
+      "pmm_vip.wm.already_saved": "A set is already saved",
+      "pmm_vip.wm.nothing_to_save": "Take a set from the weapons menu first",
+      "pmm_vip.wm.nothing_saved": "No saved set",
+      "pmm_vip.wm.forgot": "Saved set deleted",
+      "pmm_vip.wm.not_now": "You cannot take a set now: dead, out of the buy zone, buy time is over or no set yet",
+      "pmm_vip.wm.unavailable": "VIP_WeaponsMenu is not loaded",
+      "pmm_vip.wm.no_access": "{red}[VIP]{default} The weapons menu is not available to you",
+      "pmm_vip.wm.hint": "{gold}[VIP]{default} Weapons menu and saving a set: {green}{0}",
+      "pmm_vip.wm.keys_check": "{gold}[VIP]{default} Press 1 … 0 one by one. The bind line is in the console",
+      "pmm_vip.wm.keys_fail": "Number keys check failed, menu control not changed",
+      "pmm_vip.keys_wasd": "W/S — move · E — take · A/D — page · R — settings",
+      "pmm_vip.keys_wasd_set": "W/S — move · E — change · R — back",
+      "pmm_vip.keys_digits": "1–6 — take · 7 — settings · 8/9 — page · 0 — close",
+      "pmm_vip.keys_digits_set": "1–6 — change · 7 — back · 0 — close",
       "Antiflash": "Anti-Flash",
       "Armor": "Armor",
       "ArmorRegen": "Armor Regen",
@@ -334,6 +421,14 @@ Menus of other plugins are not touched: a CSS menu is intercepted only when a pl
 | `AutoCloseSeconds` | `20` | module menus that pop up by themselves (WeaponsMenu on spawn) close after N seconds, countdown in the panel. `0` = off |
 | `AutoCloseVipSeconds` | `0` | the same for `!vip` and its sub menus. `0` = off |
 | `AutoCloseWarnSeconds` | `5` | the countdown turns red for the last N seconds |
+| `WeaponsMenu.Enabled` | `true` | compact panel, settings and `!swm` for VIP_WeaponsMenu. `false` — its menu is a normal module sub menu |
+| `WeaponsMenu.Commands` | `["css_swm"]` | commands that open the settings (`css_swm` = `!swm`) |
+| `WeaponsMenu.Compact` | `true` | compact panel; `false` — the wide VIP panel (6 rows per page) |
+| `WeaponsMenu.Position` | `Left` | position of the compact panel: `Left` / `Center` / `Right` |
+| `WeaponsMenu.DefaultAskSave` | `true` | "Ask every time whether to save the set?" for players without own settings |
+| `WeaponsMenu.DefaultEveryRound` | `true` | "Open the weapon set menu automatically" for players without own settings |
+| `WeaponsMenu.DefaultMode` | `Auto` | `Auto` (from `!menu`), `Mouse`, `Wasd`, `Digits` |
+| `WeaponsMenu.Module` / `Feature` | `VIP_WeaponsMenu` / `WeaponsMenu` | module assembly name and its VIPCore feature key |
 | `Paint.Enabled` | `true` | own VIP panorama (needs the addon) |
 | `Paint.Position` | `Center` | `Left` / `Center` / `Right` |
 | `Paint.GroupPalette` | VIPBRONZE/SILVER/GOLD | group → palette from `Paint.Theme.Palettes`. Not listed — by the group name, else `DefaultPalette` |
@@ -346,7 +441,7 @@ Menus of other plugins are not touched: a CSS menu is intercepted only when a pl
 
 ## Русский
 
-### PMM_VIPCore 0.1.3 — установка
+### PMM_VIPCore 0.1.4 — установка
 
 Мост: меню оригинального VIPCore (thesamefabius, v1.3.3 / релиз recompile3) показываются через PanoramaMenuManager.
 VIPCore и модули не пересобираются — всё через Harmony, как в PMM_GG1MapChooser.
@@ -354,7 +449,7 @@ VIPCore и модули не пересобираются — всё через 
 #### Что нужно
 - CounterStrikeSharp 1.0.376 или новее (.NET 10)
 - VIPCore (оригинальный `plugins/VIPCore` + `shared/VipCoreApi`) и любые модули `VIP_*`
-- MenuManagerCS2 (PanoramaMenuManager) 1.2.03 и его клиентский аддон
+- MenuManagerCS2 (PanoramaMenuManager) 1.2.03 и его клиентский аддон (режим WeaponsMenu «Панорама цифры» — 1.2.05)
 
 VIP_Fov и VIP_Tag нужны **оригинальные** (из релиза thesamefabius), не из PMM-форка: форковые вызывают
 `VipFeatureBase.OnMenuSelect`, которого нет в оригинальном VipCoreApi (`MissingMethodException`). В архив они не входят.
@@ -383,19 +478,44 @@ panorama/styles/custom_game/pmm_vip_theme.css
 После новой версии аддона игрокам нужно перезайти.
 
 Панорама рисуется для игроков, у которых в `!menu` выбрано **PanoramaMenu** (мышь). У остальных типов
-(WASD, чат, CS:GO) — обычное меню MenuManager. Без аддона на клиенте меню не появится: тогда `Paint.Enabled: false`.
+(WASD, чат, CS:GO) — обычное меню MenuManager. Исключение — панель WeaponsMenu: она показывается всем (у неё свои режимы
+мышь / WASD / цифры, см. ниже). Без аддона на клиенте меню не появится: тогда `Paint.Enabled: false`.
 
 Что на экране:
 - шапка: ник, группа VIP (цвет по группе), срок VIP («до 12.11.2026 · 34 дн.» / «навсегда»);
 - плитки 3×4 (12 на страницу): иконка, название, значение из `vip.json` («120 HP», «x1.2»), тумблер /
   значение со списком / «▶ ИСП.» / замок «Нет доступа»;
 - клик по Fov / Tag — выбор значения плитками 4×4;
-- подменю модулей (WeaponsMenu и т.п.) — списком по 8 строк, с «Назад»;
+- подменю модулей — списком по 8 строк, с «Назад»; у WeaponsMenu своя компактная панель (ниже);
 - статус переключения внизу слева, листание внизу по центру, отсчёт автозакрытия внизу справа; страница запоминается для каждого меню;
 - собственное меню модуля (WeaponsMenu) закрывается после выбора и не имеет «Назад», как в CSS.
 
 Генератор разметки: `tools/gen_layout.py` (иконки, палитры, число плиток —
 id и классы должны совпадать с `Paint.cs`).
+
+#### WeaponsMenu (VIP_WeaponsMenu)
+Меню оружия оригинального VIP_WeaponsMenu (daffyy) показывается в компактной панели (6 строк, `WeaponsMenu.Position`)
+с шестерёнкой ⚙ в шапке слева от ×. Шестерёнка и команда в чат **`!swm`** открывают настройки
+(только для VIP с функцией `WeaponsMenu`):
+
+| Строка | Что делает |
+|---|---|
+| Спрашивать каждый раз о сохранении набора? | вкл. — «Сохранить этот набор?» после каждого выбора; выкл. — спросит один раз за карту, дальше сохранить можно здесь |
+| Автоматический вызов меню выбора комплекта оружий | выкл. — меню не всплывает при спавне; комплект берётся через «Выбрать комплект сейчас» |
+| Выбрать комплект сейчас | открывает список оружия (жив ли игрок, зона и время закупки, раунд — проверяет сам модуль) |
+| Сохранить комплект «X» | сохраняет последний взятый комплект (если в вопросе ответили «Нет» или вопрос не показывался) |
+| Удалить сохранённый комплект | при следующем спавне меню оружия снова появится (то же, что `!vwmenu` модуля) |
+| Вид меню | открывает список Панорама мышка / Панорама WASD / Панорама цифры, выбор сразу ставит режим. Цифры: при первом выборе — проверка цифр |
+
+Управление панелью:
+- мышка — клики (мышь захватывается, пока панель открыта);
+- WASD — W/S выбор, E взять, A/D страница, R настройки (в настройках — назад / закрыть); мышь остаётся игре;
+- цифры — 1–6 взять, 7 настройки / назад, 8/9 страница, 0 закрыть. Нужен PMM Core 1.2.05: при первом переключении
+  открывается проверка цифр MenuManager (строка биндов — в консоли), режим включается после её прохождения.
+
+Настройки игроков хранятся по SteamID в `plugins/PMM_VIPCore/weaponsmenu_players.json`. Значения для новых игроков —
+`WeaponsMenu.DefaultAskSave`, `DefaultEveryRound`, `DefaultMode` (`Auto` — по `!menu` игрока).
+Панели нужны файлы аддона 0.1.4 (`pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`): пересоберите аддон.
 
 #### Цвета (`Paint.Theme`)
 Панорама не принимает цвета с сервера, поэтому цвета живут в отдельном файле `pmm_vip_theme.css`:
@@ -450,6 +570,37 @@ id и классы должны совпадать с `Paint.cs`).
       "pmm_vip.page": "{0} / {1}",
       "pmm_vip.title": "VIP меню — {0}",
       "pmm_vip.closes_in": "Закроется через {0} с",
+      "pmm_vip.wm.settings_title": "Настройки меню оружия",
+      "pmm_vip.wm.ask_each_time": "Спрашивать каждый раз о сохранении набора?",
+      "pmm_vip.wm.auto_menu": "Автоматический вызов меню выбора комплекта оружий",
+      "pmm_vip.wm.mode_title": "Вид меню",
+      "pmm_vip.wm.mode_need_check": "нужна проверка цифр",
+      "pmm_vip.wm.mode_need_core": "Нужен PMM Core 1.2.05 на сервере",
+      "pmm_vip.wm.open_now": "Выбрать комплект сейчас",
+      "pmm_vip.wm.save": "Сохранить комплект",
+      "pmm_vip.wm.save_last": "Сохранить комплект «{0}»",
+      "pmm_vip.wm.forget": "Удалить сохранённый комплект",
+      "pmm_vip.wm.mode": "Вид меню",
+      "pmm_vip.wm.mode_mouse": "Панорама мышка",
+      "pmm_vip.wm.mode_wasd": "Панорама WASD",
+      "pmm_vip.wm.mode_digits": "Панорама цифры",
+      "pmm_vip.wm.mode_set": "Вид меню: {0}",
+      "pmm_vip.wm.saved": "Комплект сохранён и будет выдаваться автоматически",
+      "pmm_vip.wm.saved_auto": "Комплект сохранён и выдаётся автоматически. Удалите его, чтобы выбрать другой",
+      "pmm_vip.wm.already_saved": "Комплект уже сохранён",
+      "pmm_vip.wm.nothing_to_save": "Сначала возьмите комплект в меню оружия",
+      "pmm_vip.wm.nothing_saved": "Нет сохранённого комплекта",
+      "pmm_vip.wm.forgot": "Сохранённый комплект удалён",
+      "pmm_vip.wm.not_now": "Сейчас взять комплект нельзя: вы мертвы, вне зоны закупки, время закупки вышло или комплект ещё недоступен",
+      "pmm_vip.wm.unavailable": "VIP_WeaponsMenu не загружен",
+      "pmm_vip.wm.no_access": "{red}[VIP]{default} Меню оружия вам недоступно",
+      "pmm_vip.wm.hint": "{gold}[VIP]{default} Меню оружия и сохранение комплекта: {green}{0}",
+      "pmm_vip.wm.keys_check": "{gold}[VIP]{default} Нажмите по очереди 1 … 0. Строка с биндами — в консоли",
+      "pmm_vip.wm.keys_fail": "Проверка цифр не пройдена, вид меню не изменён",
+      "pmm_vip.keys_wasd": "W/S — выбор · E — взять · A/D — стр. · R — настройки",
+      "pmm_vip.keys_wasd_set": "W/S — выбор · E — изменить · R — назад",
+      "pmm_vip.keys_digits": "1–6 — взять · 7 — настройки · 8/9 — стр. · 0 — закрыть",
+      "pmm_vip.keys_digits_set": "1–6 — изменить · 7 — назад · 0 — закрыть",
       "Antiflash": "Анти-флеш",
       "Armor": "Броня",
       "ArmorRegen": "Реген брони",
@@ -547,6 +698,37 @@ id и классы должны совпадать с `Paint.cs`).
       "pmm_vip.page": "{0} / {1}",
       "pmm_vip.title": "VIP menu — {0}",
       "pmm_vip.closes_in": "Closes in {0}s",
+      "pmm_vip.wm.settings_title": "Weapons menu settings",
+      "pmm_vip.wm.ask_each_time": "Ask every time whether to save the set?",
+      "pmm_vip.wm.auto_menu": "Open the weapon set menu automatically",
+      "pmm_vip.wm.mode_title": "Menu control",
+      "pmm_vip.wm.mode_need_check": "keys check needed",
+      "pmm_vip.wm.mode_need_core": "Needs PMM Core 1.2.05 on the server",
+      "pmm_vip.wm.open_now": "Pick a set now",
+      "pmm_vip.wm.save": "Save the set",
+      "pmm_vip.wm.save_last": "Save set «{0}»",
+      "pmm_vip.wm.forget": "Delete the saved set",
+      "pmm_vip.wm.mode": "Menu control",
+      "pmm_vip.wm.mode_mouse": "Panorama mouse",
+      "pmm_vip.wm.mode_wasd": "Panorama WASD",
+      "pmm_vip.wm.mode_digits": "Panorama digits",
+      "pmm_vip.wm.mode_set": "Menu control: {0}",
+      "pmm_vip.wm.saved": "Set saved, it will be given automatically",
+      "pmm_vip.wm.saved_auto": "A set is saved and given automatically. Delete it to pick another one",
+      "pmm_vip.wm.already_saved": "A set is already saved",
+      "pmm_vip.wm.nothing_to_save": "Take a set from the weapons menu first",
+      "pmm_vip.wm.nothing_saved": "No saved set",
+      "pmm_vip.wm.forgot": "Saved set deleted",
+      "pmm_vip.wm.not_now": "You cannot take a set now: dead, out of the buy zone, buy time is over or no set yet",
+      "pmm_vip.wm.unavailable": "VIP_WeaponsMenu is not loaded",
+      "pmm_vip.wm.no_access": "{red}[VIP]{default} The weapons menu is not available to you",
+      "pmm_vip.wm.hint": "{gold}[VIP]{default} Weapons menu and saving a set: {green}{0}",
+      "pmm_vip.wm.keys_check": "{gold}[VIP]{default} Press 1 … 0 one by one. The bind line is in the console",
+      "pmm_vip.wm.keys_fail": "Number keys check failed, menu control not changed",
+      "pmm_vip.keys_wasd": "W/S — move · E — take · A/D — page · R — settings",
+      "pmm_vip.keys_wasd_set": "W/S — move · E — change · R — back",
+      "pmm_vip.keys_digits": "1–6 — take · 7 — settings · 8/9 — page · 0 — close",
+      "pmm_vip.keys_digits_set": "1–6 — change · 7 — back · 0 — close",
       "Antiflash": "Anti-Flash",
       "Armor": "Armor",
       "ArmorRegen": "Armor Regen",
@@ -675,6 +857,14 @@ id и классы должны совпадать с `Paint.cs`).
 | `AutoCloseSeconds` | `20` | всплывающие меню модулей (WeaponsMenu при спавне) закрываются через N секунд, отсчёт в панели. `0` — выкл. |
 | `AutoCloseVipSeconds` | `0` | то же для `!vip` и его подменю. `0` — выкл. |
 | `AutoCloseWarnSeconds` | `5` | последние N секунд отсчёт красный |
+| `WeaponsMenu.Enabled` | `true` | компактная панель, настройки и `!swm` для VIP_WeaponsMenu. `false` — его меню как обычное подменю модуля |
+| `WeaponsMenu.Commands` | `["css_swm"]` | команды, открывающие настройки (`css_swm` = `!swm`) |
+| `WeaponsMenu.Compact` | `true` | компактная панель; `false` — широкая VIP-панель (6 строк на страницу) |
+| `WeaponsMenu.Position` | `Left` | где компактная панель: `Left` / `Center` / `Right` |
+| `WeaponsMenu.DefaultAskSave` | `true` | «Спрашивать каждый раз о сохранении набора?» для игроков без своих настроек |
+| `WeaponsMenu.DefaultEveryRound` | `true` | «Автоматический вызов меню выбора комплекта оружий» для игроков без своих настроек |
+| `WeaponsMenu.DefaultMode` | `Auto` | `Auto` (по `!menu`), `Mouse`, `Wasd`, `Digits` |
+| `WeaponsMenu.Module` / `Feature` | `VIP_WeaponsMenu` / `WeaponsMenu` | имя сборки модуля и ключ его функции в VIPCore |
 | `Paint.Enabled` | `true` | своя VIP-панорама (нужен аддон) |
 | `Paint.Position` | `Center` | `Left` / `Center` / `Right` |
 | `Paint.GroupPalette` | VIPBRONZE/SILVER/GOLD | группа → палитра из `Paint.Theme.Palettes`. Нет в списке — по названию группы, иначе `DefaultPalette` |

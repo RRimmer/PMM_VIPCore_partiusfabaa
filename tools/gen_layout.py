@@ -7,7 +7,8 @@ Generates the PMM_VIPCore panorama: pmm_vip.xml + pmm_vip.css.
 The plugin (Paint.cs) drives ids and class names from the constants below, keep them in sync:
   tiles  vt-0..vt-11   (3 x 4 grid, 12 per page)
   chips  vp-0..vp-15   (value picker, 4 x 4)
-  rows   vl-0..vl-7    (sub menu list)
+  rows   vl-0..vl-7    (sub menu list; compact WeaponsMenu panel uses 6)
+  gear   vip-gear      (WeaponsMenu settings)
   dots   vip-dot-0..7
 """
 import pathlib, re, sys
@@ -80,6 +81,7 @@ def xml() -> str:
     a(T * 6 + '<Label class="vip-exp-left stratum-medium-tf" text="{s:vip_exp_left}" />')
     a(T * 5 + '</Panel>')
     a(T * 4 + '</Panel>')
+    a(T * 4 + '<Button id="vip-gear" class="vip-gear"><Panel class="vip-gear-ic" hittest="false" /></Button>')
     a(T * 4 + '<Button id="vip-close" class="vip-x"><Label class="vip-x-t stratum-bold-tf" text="×" /></Button>')
     a(T * 3 + '</Panel>')
     a(T * 3 + '<Panel class="vip-sep" hittest="false" />')
@@ -122,7 +124,13 @@ def xml() -> str:
     # list
     a(T * 3 + '<Panel class="vip-list only-list">')
     for i in range(ROWS):
-        a(T * 4 + f'<Button id="vl-{i}" class="vl"><Label class="vl-t stratum-bold-tf" text="{{s:vlr{i}}}" /><Panel class="vl-chev" hittest="false" /></Button>')
+        a(T * 4 + f'<Button id="vl-{i}" class="vl"><Label class="vl-n stratum-bold-tf" text="{i + 1}" />'
+               f'<Label class="vl-t stratum-bold-tf" text="{{s:vlr{i}}}" /><Label class="vl-v stratum-bold-tf" text="{{s:vlv{i}}}" />'
+               '<Panel class="vl-sw" hittest="false"><Panel class="vl-knob" hittest="false" /></Panel>'
+               '<Panel class="vl-chev" hittest="false" /></Button>')
+    # compact panel: status line and key hints under the rows (the footer is too narrow for them)
+    a(T * 4 + '<Label class="vip-ctoast stratum-medium-tf" text="{s:vip_toast}" />')
+    a(T * 4 + '<Label class="vip-keys stratum-medium-tf" text="{s:vip_keys}" />')
     a(T * 3 + '</Panel>')
     # footer
     a(T * 3 + '<Panel class="vip-foot">')
@@ -880,8 +888,163 @@ def accent_rules(name, acc, light, dark, default=False) -> str:
     return "\n".join(f"{s} {{ {b} }}" for s, b in rules) + "\n"
 
 
+WM = r"""
+/* ============================================================
+   WeaponsMenu panel (0.1.4): root classes compact, has-gear, mode-wasd | mode-digits, has-keys.
+   Row classes: rk-toggle | rk-value | rk-plain, on, dis, is-cur.
+   ============================================================ */
+
+.vip-gear
+{
+	width: 36px;
+	height: 36px;
+	margin-right: 8px;
+	vertical-align: center;
+	border-radius: 8px;
+	background-color: #ffffff0d;
+	visibility: collapse;
+	transition-property: background-color;
+	transition-duration: dur;
+	transition-timing-function: ease-out;
+}
+
+.vip-root.has-gear .vip-gear { visibility: visible; }
+.vip-gear:hover { background-color: #ffffff22; }
+
+.vip-gear-ic
+{
+	width: 20px;
+	height: 20px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-image: url("s2r://panorama/images/icons/ui/settings.vsvg");
+	background-size: 100% 100%;
+	wash-color: #dddddd;
+}
+
+/* row parts: number (digits mode), value, switch */
+.vl-n
+{
+	width: 26px;
+	height: 26px;
+	margin-left: 12px;
+	vertical-align: center;
+	border-radius: 6px;
+	background-color: #ffffff14;
+	text-align: center;
+	font-size: 15px;
+	color: #ffffff;
+	visibility: collapse;
+}
+
+.vip-root.mode-digits .vl-n { visibility: visible; }
+.vip-root.mode-digits .vl-t { margin-left: 10px; }
+
+.vl-v
+{
+	max-width: 150px;
+	margin-right: 10px;
+	vertical-align: center;
+	font-size: 14px;
+	color: #8e897f;
+	text-overflow: shrink;
+	white-space: nowrap;
+	visibility: collapse;
+}
+
+.vl.rk-value .vl-v { visibility: visible; }
+
+.vl-sw
+{
+	width: 42px;
+	height: 24px;
+	margin-right: 14px;
+	vertical-align: center;
+	border-radius: 12px;
+	background-color: #ffffff1f;
+	visibility: collapse;
+	transition-property: background-color, box-shadow;
+	transition-duration: dur;
+	transition-timing-function: ease-out;
+}
+
+.vl.rk-toggle .vl-sw { visibility: visible; }
+.vl.rk-toggle .vl-chev { visibility: collapse; }
+
+.vl-knob
+{
+	width: 18px;
+	height: 18px;
+	margin-left: 3px;
+	horizontal-align: left;
+	vertical-align: center;
+	border-radius: 9px;
+	background-color: #9a958c;
+	transition-property: horizontal-align, margin-left, background-color;
+	transition-duration: dur;
+	transition-timing-function: ease-out;
+}
+
+.vl.on .vl-knob
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 3px;
+	background-color: #ffffff;
+}
+
+.vl.is-cur { background-color: #ffffff1a; }
+
+.vip-ctoast, .vip-keys
+{
+	width: 100%;
+	margin-top: 2px;
+	font-size: 12px;
+	color: #a7a29a;
+	text-align: center;
+	text-overflow: shrink;
+	white-space: nowrap;
+	visibility: collapse;
+}
+
+.vip-root.compact.toast-on .vip-ctoast { visibility: visible; color: #d6efcd; }
+.vip-root.compact.toast-on.toast-warn .vip-ctoast { color: #f3d0d0; }
+.vip-root.has-keys .vip-keys { visibility: visible; }
+
+/* ---------- compact (WeaponsMenu) ---------- */
+
+.vip-root.compact { width: 440px; }
+.vip-root.compact.pos-left { margin-left: 24px; }
+.vip-root.compact.pos-right { margin-right: 24px; }
+.vip-root.compact .vip-head { height: 70px; padding: 11px 14px 10px 14px; }
+.vip-root.compact .vip-badge { width: 46px; height: 46px; border-radius: 10px; }
+.vip-root.compact .vip-badge-t { font-size: 17px; }
+.vip-root.compact .vip-ht { margin-left: 12px; }
+.vip-root.compact .vip-nick { font-size: 18px; }
+.vip-root.compact .vip-meta { margin-top: 3px; }
+.vip-root.compact .vip-gear, .vip-root.compact .vip-x { width: 32px; height: 32px; }
+.vip-root.compact .vip-sep { margin: 0px 14px; }
+.vip-root.compact .vip-sub { height: 42px; padding: 10px 14px 0px 14px; }
+.vip-root.compact .vip-sub-title { font-size: 15px; }
+.vip-root.compact .vip-sub-hint { visibility: collapse; }
+.vip-root.compact .vip-list { padding: 6px 14px 2px 14px; }
+.vip-root.compact .vl { height: 40px; margin-bottom: 6px; border-radius: 8px; }
+.vip-root.compact .vl-t { font-size: 14px; margin-left: 12px; }
+.vip-root.compact.mode-digits .vl-t { margin-left: 8px; }
+.vip-root.compact .vl-n { width: 24px; height: 24px; margin-left: 9px; font-size: 14px; }
+.vip-root.compact .vip-foot { height: 44px; padding: 2px 14px 10px 14px; }
+.vip-root.compact .vip-fleft { width: 110px; }
+.vip-root.compact .vip-fright { width: 150px; }
+.vip-root.compact .vip-toast { visibility: collapse; }
+.vip-root.compact .vip-back { height: 28px; padding: 0px 10px; }
+.vip-root.compact .vip-pb { width: 28px; height: 26px; }
+.vip-root.compact .vip-dots { visibility: collapse; }
+.vip-root.compact .vip-timer-t { font-size: 12px; }
+"""
+
+
 def css() -> str:
-    o = [BASE, "\n/* ---------- group palettes (grp-*) ---------- */\n"]
+    o = [BASE, WM, "\n/* ---------- group palettes (grp-*) ---------- */\n"]
     g = PALETTE["gold"]
     o.append("/* default = gold */\n" + accent_rules("gold", *g, default=True))
     for name, (a, l, d) in PALETTE.items():

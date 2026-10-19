@@ -60,6 +60,29 @@ public class BridgeConfig : BasePluginConfig
 
     // Own VIP panorama (pmm_vip.xml) for players whose MenuManager menu is PanoramaMenu.
     [JsonPropertyName("Paint")] public PaintOptions Paint { get; set; } = new();
+
+    // VIP_WeaponsMenu: compact panel, settings (gear / !swm), mouse / WASD / digits.
+    [JsonPropertyName("WeaponsMenu")] public WeaponsMenuOptions WeaponsMenu { get; set; } = new();
+}
+
+public class WeaponsMenuOptions
+{
+    [JsonPropertyName("Enabled")] public bool Enabled { get; set; } = true;
+    // Chat / console commands that open the settings (css_swm = !swm).
+    [JsonPropertyName("Commands")] public List<string> Commands { get; set; } = new() { "css_swm" };
+    // Small panel instead of the wide VIP one.
+    [JsonPropertyName("Compact")] public bool Compact { get; set; } = true;
+    // Left / Center / Right
+    [JsonPropertyName("Position")] public string Position { get; set; } = "Left";
+    // Defaults for a player who never opened the settings.
+    [JsonPropertyName("DefaultAskSave")] public bool DefaultAskSave { get; set; } = true;
+    [JsonPropertyName("DefaultEveryRound")] public bool DefaultEveryRound { get; set; } = true;
+    // Auto / Mouse / Wasd / Digits. Auto = from the player's !menu (Panorama WASD -> Wasd, Panorama digits -> Digits).
+    // Digits needs PMM Core 1.2.05 and a passed number keys check, otherwise Mouse is used.
+    [JsonPropertyName("DefaultMode")] public string DefaultMode { get; set; } = "Auto";
+    // Assembly name of the module and its VIPCore feature key.
+    [JsonPropertyName("Module")] public string Module { get; set; } = "VIP_WeaponsMenu";
+    [JsonPropertyName("Feature")] public string Feature { get; set; } = "WeaponsMenu";
 }
 
 public class PaintOptions

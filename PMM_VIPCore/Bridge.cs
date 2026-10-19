@@ -16,11 +16,14 @@ internal sealed class VipMenu : BaseMenu
 {
     public VipMenu(string title) : base(title) { }
 
+    // Plugin that called VipApi.CreateMenu (VIPCore itself, VIP_WeaponsMenu ...).
+    public string? Owner { get; init; }
+
     public override void Open(CCSPlayerController player)
     {
         if (Plugin.Instance is { Active: true } p)
         {
-            p.Show(player, this);
+            p.Show(player, this, Owner);
             return;
         }
 
@@ -47,6 +50,7 @@ public partial class Plugin
         public IMenu Source = null!;
         public bool IsMain;      // the !vip menu itself (rebuilt by VIPCore on every reopen)
         public Shown? Parent;    // menu whose row opened this one -> "Back"
+        public WmKind Wm;        // VIP_WeaponsMenu menu (compact panel, settings, modes) or None
     }
 
     private sealed class SlotState
@@ -76,7 +80,8 @@ public partial class Plugin
     {
         if (!Active) return;
         _core ??= Get(vipApi, "_vipCore");
-        result = new VipMenu(title);
+        // The patched CreateMenu may show up as a VIPCore frame: the module that called it is the owner.
+        result = new VipMenu(title) { Owner = CallerAssembly("VIPCore") };
     }
 
     internal void EnterMain(object core)
@@ -107,7 +112,7 @@ public partial class Plugin
         if (owner == null || !Matches(owner)) return false;
 
         if (Config.Debug) Logger.LogInformation("[{Slot}] intercept {Type} '{Title}' from {Owner}", player.Slot, menu.GetType().Name, menu.Title, owner);
-        Show(player, menu);
+        Show(player, menu, owner);
         return true;
     }
 
@@ -124,9 +129,10 @@ public partial class Plugin
         if (!active.TryGetValue(player.Handle, out var current) || !ReferenceEquals(current, instance)) return false;
 
         var st = State(player.Slot);
+        string? owner = null;
         if (st.Capture == null)
         {
-            string? owner = (Get(instance, "_plugin") as BasePlugin)?.GetType().Assembly.GetName().Name ?? CallerAssembly();
+            owner = (Get(instance, "_plugin") as BasePlugin)?.GetType().Assembly.GetName().Name ?? CallerAssembly();
             if (owner == null || !Matches(owner)) return false;
             if (Config.Debug) Logger.LogInformation("[{Slot}] intercept {Type} '{Title}' from {Owner} at Display", player.Slot, instance.GetType().Name, menu.Title, owner);
         }
@@ -136,14 +142,21 @@ public partial class Plugin
         catch (TargetInvocationException) { }
         active.Remove(player.Handle);
 
-        Show(player, menu);
+        Show(player, menu, owner);
         return true;
     }
 
     // Module texts (GetTranslatedText): the translations file wins when it has the key.
     internal void ModuleText(string? name, object[]? args, ref string result)
     {
-        if (!Active || _tr == null || string.IsNullOrEmpty(name)) return;
+        if (!Active || string.IsNullOrEmpty(name)) return;
+        try { ModuleTextCore(name, args, ref result); }
+        finally { RememberTextKey(result, name); }   // menu title -> key (WeaponsMenu menus are recognised by it)
+    }
+
+    private void ModuleTextCore(string name, object[]? args, ref string result)
+    {
+        if (_tr == null) return;
         System.Globalization.CultureInfo culture;
         try
         {
@@ -155,9 +168,8 @@ public partial class Plugin
 
         var text = _tr.Get(culture, name);
         if (text == null) return;
-        string s;
-        try { s = args is { Length: > 0 } ? string.Format(text, args) : text; }
-        catch (FormatException) { s = text; }
+        // {red}{0}{default}: colour tags make string.Format throw, so only {0} {1:F1} ... are filled in.
+        string s = args is { Length: > 0 } ? Fmt(text, args) : text;
         result = CounterStrikeSharp.API.Core.Translations.StringExtensions.ReplaceColorTags(s);
     }
 
@@ -192,7 +204,7 @@ public partial class Plugin
 
     // ---------------- showing ----------------
 
-    internal void Show(CCSPlayerController player, IMenu src)
+    internal void Show(CCSPlayerController player, IMenu src, string? owner = null)
     {
         if (!player.IsValid) return;
         var st = State(player.Slot);
@@ -208,10 +220,16 @@ public partial class Plugin
             if (Config.Debug) Logger.LogInformation("[{Slot}] '{Title}': every row is disabled, not opened", player.Slot, src.Title);
             return;
         }
+        var wm = main ? WmKind.None : WmClassify(src, owner);
+        if (Config.Debug)
+            Logger.LogInformation("[{Slot}] show '{Title}' ({Type}) owner={Owner} key={Key} wm={Wm}",
+                player.Slot, src.Title, src.GetType().Name, owner ?? "-", TextKey(src.Title) ?? "-", wm);
+        if (wm != WmKind.None && !WmAllowShow(player, src, wm)) return;
         var sh = new Shown
         {
             Source = src,
             IsMain = main,
+            Wm = wm,
             // "Back" only inside the !vip chain. A module's own CSS menu (WeaponsMenu) that opens another one
             // is replaced by it, as in CSS: no way back to the weapons list after a set was taken.
             Parent = main ? null : st.Running.Count > 0 && FromVip(st.Running.Peek()) ? st.Running.Peek() : null,
@@ -235,7 +253,9 @@ public partial class Plugin
     }
 
     // !vip itself, VIPCore API menus (VipApi.CreateMenu) and everything opened from them.
-    private static bool FromVip(Shown sh) => sh.IsMain || sh.Parent != null || sh.Source is VipMenu;
+    // A WeaponsMenu list / save prompt is a module's own pop-up menu even when it was built with VipApi.CreateMenu.
+    private static bool FromVip(Shown sh) =>
+        sh.IsMain || sh.Parent != null || sh.Wm is WmKind.Settings or WmKind.Mode || (sh.Source is VipMenu && sh.Wm == WmKind.None);
 
     private void Render(CCSPlayerController player, Shown sh)
     {
@@ -271,7 +291,9 @@ public partial class Plugin
             try { title = string.Format(mainTitle, group); } catch (FormatException) { title = mainTitle; }
         }
         Action<CCSPlayerController>? back = Config.BackButton && sh.Parent is { } parent ? p => Reopen(p, parent) : null;
-        IMenu menu = _forceType is { } ft ? _api!.GetMenuForcetype(title, ft, back) : _api!.GetMenu(title, back);
+        // WeaponsMenu menus always go to our panel (it has their mouse / WASD / digits modes).
+        MenuType? force = sh.Wm != WmKind.None && _registry != null && Config.Paint.Enabled ? MenuType.PanoramaMenu : _forceType;
+        IMenu menu = force is { } ft ? _api!.GetMenuForcetype(title, ft, back) : _api!.GetMenu(title, back);
         menu.ExitButton = Config.ExitButton || src.ExitButton;
 
         var options = src.MenuOptions.ToList();
@@ -285,7 +307,10 @@ public partial class Plugin
                 entries = null;
             }
         }
+        if (sh.Wm == WmKind.Settings) entries = BuildWmSettings(player, sh);
+        if (sh.Wm == WmKind.Mode) entries = BuildWmModes(player, sh);
         entries ??= options.Select(o => PlainEntry(sh, o, strip, sh.IsMain ? Kind.Legacy : Kind.Plain)).ToList();
+        if (sh.Wm == WmKind.List) WmWrapPicks(player, entries);
 
         foreach (var e in entries)
         {
@@ -299,7 +324,8 @@ public partial class Plugin
                     _api!.AddSelect(menu, en.Label, en.Value, en.Choices, (p, _, i) => en.Pick?.Invoke(p, i), en.Disabled);
                     break;
                 default:
-                    menu.AddMenuOption(en.Label, (p, _) => en.Click(p), en.Disabled);
+                    // value rows (WeaponsMenu settings "Menu control: WASD") as one text in the standard MenuManager list
+                    menu.AddMenuOption(en.Value != "" ? $"{en.Label}: {en.Value}" : en.Label, (p, _) => en.Click(p), en.Disabled);
                     break;
             }
         }
@@ -312,6 +338,7 @@ public partial class Plugin
             IsMain = sh.IsMain,
             Back = back,
             Entries = entries,
+            Wm = sh.Wm,
         });
 
         if (Config.Debug)

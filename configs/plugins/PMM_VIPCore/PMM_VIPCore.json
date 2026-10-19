@@ -22,6 +22,19 @@
   "AutoCloseSeconds": 20,
   "AutoCloseVipSeconds": 0,
   "AutoCloseWarnSeconds": 5,
+  "WeaponsMenu": {
+    "Enabled": true,
+    "Commands": [
+      "css_swm"
+    ],
+    "Compact": true,
+    "Position": "Left",
+    "DefaultAskSave": true,
+    "DefaultEveryRound": true,
+    "DefaultMode": "Auto",
+    "Module": "VIP_WeaponsMenu",
+    "Feature": "WeaponsMenu"
+  },
   "Paint": {
     "Enabled": true,
     "LayoutPath": "panorama/layout/custom_game/pmm_vip.xml",

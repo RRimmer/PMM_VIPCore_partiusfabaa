@@ -38,6 +38,7 @@ public partial class Plugin : IPmmMenuPainter
         public bool IsMain;
         public Action<CCSPlayerController>? Back;
         public List<Entry> Entries = new();
+        public WmKind Wm;
     }
 
     private sealed class PaintSlot
@@ -50,6 +51,9 @@ public partial class Plugin : IPmmMenuPainter
         public int PickPage;
         public bool Captured;
         public int ToastToken;
+        public WmInput Mode;                  // input of the drawn view (WeaponsMenu: mouse / WASD / digits)
+        public int Cur;                       // WASD cursor: row on the page
+        public ulong Buttons = ulong.MaxValue; // WASD: buttons on the previous tick
         public readonly Dictionary<string, int> Pages = new(StringComparer.Ordinal);   // title -> page
         public readonly Dictionary<string, bool> Cls = new(StringComparer.Ordinal);
         public readonly Dictionary<string, string> Vars = new(StringComparer.Ordinal);
@@ -163,6 +167,7 @@ public partial class Plugin : IPmmMenuPainter
         }
 
         bool wasOpen = ps.Open;
+        if (!ReferenceEquals(ps.View?.Shown, view.Shown)) ps.Cur = 0;
         if (ps.View != null) ps.Pages[ps.View.Title] = ps.Page;
         ps.View = view;
         ps.Pick = -1;
@@ -175,12 +180,7 @@ public partial class Plugin : IPmmMenuPainter
         Later(wasOpen ? 0f : Config.Paint.OpenDelay, () =>
         {
             if (ps.Token != token || !ps.Open || !player.IsValid) return;
-            Draw(player);
-            if (ps.Captured) return;
-            Later(Config.Paint.InputDelay, () =>
-            {
-                if (ps.Token == token && ps.Open && player.IsValid) Capture(player, true);
-            });
+            Draw(player);   // also takes the mouse (after InputDelay) when the view is driven by the mouse
         });
         return true;
     }
@@ -211,6 +211,9 @@ public partial class Plugin : IPmmMenuPainter
                 case "vip-close":
                     Hide(player);
                     return;
+                case "vip-gear":
+                    if (view.Wm is WmKind.List or WmKind.Save && ps.Pick < 0) WmOpenSettings(player, view.Shown);
+                    return;
                 case "vip-prev":
                 case "vip-next":
                 {
@@ -222,8 +225,9 @@ public partial class Plugin : IPmmMenuPainter
                     }
                     else
                     {
-                        int pages = Pages(view.Entries.Count, view.IsMain ? TilesPerPage : RowsPerPage);
+                        int pages = Pages(view.Entries.Count, view.IsMain ? TilesPerPage : RowsOf(view));
                         ps.Page = Math.Clamp(ps.Page + step, 0, pages - 1);
+                        ps.Cur = 0;
                         ps.Pages[view.Title] = ps.Page;
                     }
                     Draw(player);
@@ -249,9 +253,9 @@ public partial class Plugin : IPmmMenuPainter
                 ClickEntry(player, ps, view, ps.Page * TilesPerPage + t);
                 return;
             }
-            if (TryIndex(buttonId, "vl-", out int r) && !view.IsMain && ps.Pick < 0)
+            if (TryIndex(buttonId, "vl-", out int r) && !view.IsMain && ps.Pick < 0 && r < RowsOf(view))
             {
-                ClickEntry(player, ps, view, ps.Page * RowsPerPage + r);
+                ClickEntry(player, ps, view, ps.Page * RowsOf(view) + r);
                 return;
             }
             if (TryIndex(buttonId, "vp-", out int c) && ps.Pick >= 0 && ps.Pick < view.Entries.Count)
@@ -278,9 +282,11 @@ public partial class Plugin : IPmmMenuPainter
     {
         if (index < 0 || index >= view.Entries.Count) return;
         var e = view.Entries[index];
+        if (view.Wm != WmKind.None) ps.Cur = index % WmRows;
         if (e.Disabled)
         {
-            Toast(player, $"{e.Label} — {T(player, "no_access", Tx.NoAccess)}", true);
+            // Settings rows say why they are off ("No saved set" ...).
+            Toast(player, view.Wm is WmKind.Settings or WmKind.Mode && e.Desc != "" ? e.Desc : $"{e.Label} — {T(player, "no_access", Tx.NoAccess)}", true);
             return;
         }
 
@@ -323,7 +329,20 @@ public partial class Plugin : IPmmMenuPainter
         string mode = ps.Pick >= 0 && ps.Pick < view.Entries.Count ? "pick" : view.IsMain ? "main" : "list";
         OneHot(player, RootId, "view", "view-" + mode);
         Cls(player, RootId, "has-back", mode == "pick" || view.Back != null);
-        string pos = Config.Paint.Position.ToLowerInvariant() switch { "left" => "pos-left", "right" => "pos-right", _ => "" };
+
+        // WeaponsMenu: compact panel, gear, input mode with key hints.
+        bool wm = view.Wm != WmKind.None;
+        bool compact = wm && Config.WeaponsMenu.Compact;
+        ps.Mode = wm ? WmModeOf(player) : WmInput.Mouse;
+        Cls(player, RootId, "compact", compact);
+        Cls(player, RootId, "has-gear", view.Wm is WmKind.List or WmKind.Save);
+        OneHot(player, RootId, "imode", ps.Mode switch { WmInput.Wasd => "mode-wasd", WmInput.Digits => "mode-digits", _ => "" });
+        string keys = wm ? WmKeysHint(player, view, ps.Mode) : "";
+        if (keys != "") Var(player, RootId, "vip_keys", keys);
+        Cls(player, RootId, "has-keys", keys != "");
+        TakeInput(player, ps);
+
+        string pos = (compact ? Config.WeaponsMenu.Position : Config.Paint.Position).ToLowerInvariant() switch { "left" => "pos-left", "right" => "pos-right", _ => "" };
         OneHot(player, RootId, "pos", pos);
         Var(player, RootId, "vip_use", T(player, "use", Tx.Use));
         Var(player, RootId, "vip_back", T(player, "back", Tx.Back));
@@ -348,12 +367,15 @@ public partial class Plugin : IPmmMenuPainter
                 break;
             }
             default:
-                pages = Pages(view.Entries.Count, RowsPerPage);
+            {
+                int per = RowsOf(view);
+                pages = Pages(view.Entries.Count, per);
                 page = ps.Page = Math.Clamp(ps.Page, 0, pages - 1);
                 Var(player, RootId, "vip_sub_title", view.Title);
                 Var(player, RootId, "vip_sub_hint", T(player, "list_hint", Tx.ListHint));
-                DrawRows(player, view.Entries, page);
+                DrawRows(player, view.Entries, page, per, ps.Mode == WmInput.Wasd ? ps.Cur : -1);
                 break;
+            }
         }
 
         Cls(player, RootId, "has-pages", pages > 1);
@@ -456,10 +478,11 @@ public partial class Plugin : IPmmMenuPainter
         }
     }
 
-    private void DrawRows(CCSPlayerController player, List<Entry> entries, int page)
+    private void DrawRows(CCSPlayerController player, List<Entry> entries, int page, int per, int cur)
     {
-        int first = page * RowsPerPage;
-        int onPage = Math.Max(0, Math.Min(RowsPerPage, entries.Count - first));
+        int first = page * per;
+        int onPage = Math.Max(0, Math.Min(per, entries.Count - first));
+        if (cur >= onPage) cur = onPage - 1;
         for (int i = 0; i < RowsPerPage; i++)
         {
             string id = "vl-" + i;
@@ -472,7 +495,32 @@ public partial class Plugin : IPmmMenuPainter
             Cls(player, id, "slot-off", false);
             Cls(player, id, "dis", e.Disabled);
             Var(player, id, "vlr" + i, e.Label);
+            // switch (toggle), value on the right (settings), chevron (plain)
+            OneHot(player, id, "rkind", e.Kind == Kind.Toggle ? "rk-toggle" : e.Value != "" ? "rk-value" : "rk-plain");
+            Cls(player, id, "on", e.Kind == Kind.Toggle && e.On);
+            Cls(player, id, "is-cur", i == cur);
+            Var(player, id, "vlv" + i, e.Value);
         }
+    }
+
+    // Rows per page: the compact WeaponsMenu panel has 6 (digits 1-6), other lists 8.
+    private static int RowsOf(PaintView view) => view.Wm != WmKind.None ? WmRows : RowsPerPage;
+
+    // Mouse views capture the input (after InputDelay: never in the frame of a chat command);
+    // WASD / digits views leave the mouse to the game.
+    private void TakeInput(CCSPlayerController player, PaintSlot ps)
+    {
+        if (ps.Mode != WmInput.Mouse)
+        {
+            Capture(player, false);
+            return;
+        }
+        if (ps.Captured) return;
+        int token = ps.Token;
+        Later(Config.Paint.InputDelay, () =>
+        {
+            if (ps.Token == token && ps.Open && ps.Mode == WmInput.Mouse && player.IsValid) Capture(player, true);
+        });
     }
 
     // Countdown in the footer (AutoCloseSeconds / AutoCloseVipSeconds).
@@ -505,6 +553,7 @@ public partial class Plugin : IPmmMenuPainter
         ps.View = null;
         ps.Pick = -1;
         ps.Token++;
+        ps.Buttons = ulong.MaxValue;
         if (!player.IsValid || _vipLayout is not { IsValid: true }) return;
         Capture(player, false);
         Cls(player, RootId, "toast-on", false);
@@ -604,6 +653,8 @@ public partial class Plugin : IPmmMenuPainter
         "pal" => PaletteNames().Select(p => "grp-" + p).ToArray(),
         "kind" => new[] { "k-toggle", "k-select", "k-action", "k-plain" },
         "pos" => new[] { "pos-left", "pos-right" },
+        "imode" => new[] { "mode-wasd", "mode-digits" },
+        "rkind" => new[] { "rk-toggle", "rk-value", "rk-plain" },
         _ => null,
     };
 
@@ -650,10 +701,21 @@ public partial class Plugin : IPmmMenuPainter
         return id.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(id.AsSpan(prefix.Length), out index) && index >= 0;
     }
 
+    // Fills {0}, {1:F1} ... and leaves everything else as is ({red}, {gold} colour tags, stray braces).
+    // string.Format would throw on the colour tags and the text would keep a literal {0}.
+    private static readonly System.Text.RegularExpressions.Regex ArgSlot =
+        new(@"\{(\d+)((?:,-?\d+)?(?::[^{}]*)?)\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+
     private static string Fmt(string format, params object[] args)
     {
-        try { return string.Format(format, args); }
-        catch (FormatException) { return format; }
+        if (string.IsNullOrEmpty(format) || args.Length == 0) return format;
+        return ArgSlot.Replace(format, m =>
+        {
+            int i = int.Parse(m.Groups[1].Value);
+            if (i >= args.Length) return m.Value;
+            try { return string.Format("{0" + m.Groups[2].Value + "}", args[i]); }
+            catch (FormatException) { return args[i]?.ToString() ?? ""; }
+        });
     }
 
     private void Later(float delay, Action action)

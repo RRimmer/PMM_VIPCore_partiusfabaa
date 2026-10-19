@@ -35,6 +35,18 @@
 .vip-back-t, .vip-page { color: #dddddd; }
 .vip-pb-ic { wash-color: #dddddd; }
 .vip-dot { background-color: #ffffff26; }
+/* WeaponsMenu panel: list switch, value, gear, key hints, WASD cursor */
+.vl-sw { background-color: #ffffff1f; }
+.vl-knob { background-color: #9a958c; }
+.vl.on .vl-knob { background-color: #ffffff; }
+.vl-v { color: #8e897f; }
+.vl.is-cur { background-color: #ffffff12; }
+.vip-gear { background-color: #ffffff0f; }
+.vip-gear:hover { background-color: #ffffff22; }
+.vip-gear-ic { wash-color: #dddddd; }
+.vip-keys { color: #a7a29a; }
+.vip-root.compact.toast-on .vip-ctoast { color: #d6efcd; }
+.vip-root.compact.toast-on.toast-warn .vip-ctoast { color: #f3d0d0; }
 .vip-timer-t { color: #a7a29a; }
 .vip-timer-ic { wash-color: #a7a29a; }
 .vip-root.timer-low .vip-timer-t { color: #ff8a8a; }
@@ -72,6 +84,9 @@
 .vip-root.grp-gold .vp.sel .vp-t { color: #ffe39a; }
 .vip-root.grp-gold .vl:hover { border: 1px solid #f2c35b99; }
 .vip-root.grp-gold .vip-dot.a { background-color: #f2c35b; }
+.vip-root.grp-gold .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #a8701a ), to( #f2c35b ) ); box-shadow: #f2c35b66 0px 0px 10px 0px; }
+.vip-root.grp-gold .vl.is-cur { border: 1px solid #f2c35b; }
+.vip-root.grp-gold .vl-n { background-color: #f2c35b26; color: #ffe39a; }
 /* silver */
 .vip-root.grp-silver .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9d2dc00 ), color-stop( 0.3, #c9d2dc ), color-stop( 0.5, #f2f6fa ), color-stop( 0.7, #c9d2dc ), to( #c9d2dc00 ) ); }
 .vip-root.grp-silver .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #c9d2dc14 ), to( #c9d2dc00 ) ); }
@@ -97,6 +112,9 @@
 .vip-root.grp-silver .vp.sel .vp-t { color: #f2f6fa; }
 .vip-root.grp-silver .vl:hover { border: 1px solid #c9d2dc99; }
 .vip-root.grp-silver .vip-dot.a { background-color: #c9d2dc; }
+.vip-root.grp-silver .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d8894 ), to( #c9d2dc ) ); box-shadow: #c9d2dc66 0px 0px 10px 0px; }
+.vip-root.grp-silver .vl.is-cur { border: 1px solid #c9d2dc; }
+.vip-root.grp-silver .vl-n { background-color: #c9d2dc26; color: #f2f6fa; }
 /* bronze */
 .vip-root.grp-bronze .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #d8915a00 ), color-stop( 0.3, #d8915a ), color-stop( 0.5, #f3c39b ), color-stop( 0.7, #d8915a ), to( #d8915a00 ) ); }
 .vip-root.grp-bronze .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #d8915a14 ), to( #d8915a00 ) ); }
@@ -122,6 +140,9 @@
 .vip-root.grp-bronze .vp.sel .vp-t { color: #f3c39b; }
 .vip-root.grp-bronze .vl:hover { border: 1px solid #d8915a99; }
 .vip-root.grp-bronze .vip-dot.a { background-color: #d8915a; }
+.vip-root.grp-bronze .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8a4f22 ), to( #d8915a ) ); box-shadow: #d8915a66 0px 0px 10px 0px; }
+.vip-root.grp-bronze .vl.is-cur { border: 1px solid #d8915a; }
+.vip-root.grp-bronze .vl-n { background-color: #d8915a26; color: #f3c39b; }
 /* platinum */
 .vip-root.grp-platinum .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9fe3e000 ), color-stop( 0.3, #9fe3e0 ), color-stop( 0.5, #e2fbfa ), color-stop( 0.7, #9fe3e0 ), to( #9fe3e000 ) ); }
 .vip-root.grp-platinum .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9fe3e014 ), to( #9fe3e000 ) ); }
@@ -147,6 +168,9 @@
 .vip-root.grp-platinum .vp.sel .vp-t { color: #e2fbfa; }
 .vip-root.grp-platinum .vl:hover { border: 1px solid #9fe3e099; }
 .vip-root.grp-platinum .vip-dot.a { background-color: #9fe3e0; }
+.vip-root.grp-platinum .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #4f9a97 ), to( #9fe3e0 ) ); box-shadow: #9fe3e066 0px 0px 10px 0px; }
+.vip-root.grp-platinum .vl.is-cur { border: 1px solid #9fe3e0; }
+.vip-root.grp-platinum .vl-n { background-color: #9fe3e026; color: #e2fbfa; }
 /* emerald */
 .vip-root.grp-emerald .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5fd38d00 ), color-stop( 0.3, #5fd38d ), color-stop( 0.5, #b7f5cf ), color-stop( 0.7, #5fd38d ), to( #5fd38d00 ) ); }
 .vip-root.grp-emerald .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5fd38d14 ), to( #5fd38d00 ) ); }
@@ -172,6 +196,9 @@
 .vip-root.grp-emerald .vp.sel .vp-t { color: #b7f5cf; }
 .vip-root.grp-emerald .vl:hover { border: 1px solid #5fd38d99; }
 .vip-root.grp-emerald .vip-dot.a { background-color: #5fd38d; }
+.vip-root.grp-emerald .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #24804a ), to( #5fd38d ) ); box-shadow: #5fd38d66 0px 0px 10px 0px; }
+.vip-root.grp-emerald .vl.is-cur { border: 1px solid #5fd38d; }
+.vip-root.grp-emerald .vl-n { background-color: #5fd38d26; color: #b7f5cf; }
 /* ruby */
 .vip-root.grp-ruby .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ef5a6f00 ), color-stop( 0.3, #ef5a6f ), color-stop( 0.5, #ffb0bb ), color-stop( 0.7, #ef5a6f ), to( #ef5a6f00 ) ); }
 .vip-root.grp-ruby .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #ef5a6f14 ), to( #ef5a6f00 ) ); }
@@ -197,6 +224,9 @@
 .vip-root.grp-ruby .vp.sel .vp-t { color: #ffb0bb; }
 .vip-root.grp-ruby .vl:hover { border: 1px solid #ef5a6f99; }
 .vip-root.grp-ruby .vip-dot.a { background-color: #ef5a6f; }
+.vip-root.grp-ruby .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9a2133 ), to( #ef5a6f ) ); box-shadow: #ef5a6f66 0px 0px 10px 0px; }
+.vip-root.grp-ruby .vl.is-cur { border: 1px solid #ef5a6f; }
+.vip-root.grp-ruby .vl-n { background-color: #ef5a6f26; color: #ffb0bb; }
 /* sapphire */
 .vip-root.grp-sapphire .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5f9cf200 ), color-stop( 0.3, #5f9cf2 ), color-stop( 0.5, #b9d6ff ), color-stop( 0.7, #5f9cf2 ), to( #5f9cf200 ) ); }
 .vip-root.grp-sapphire .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #5f9cf214 ), to( #5f9cf200 ) ); }
@@ -222,6 +252,9 @@
 .vip-root.grp-sapphire .vp.sel .vp-t { color: #b9d6ff; }
 .vip-root.grp-sapphire .vl:hover { border: 1px solid #5f9cf299; }
 .vip-root.grp-sapphire .vip-dot.a { background-color: #5f9cf2; }
+.vip-root.grp-sapphire .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2a5aa8 ), to( #5f9cf2 ) ); box-shadow: #5f9cf266 0px 0px 10px 0px; }
+.vip-root.grp-sapphire .vl.is-cur { border: 1px solid #5f9cf2; }
+.vip-root.grp-sapphire .vl-n { background-color: #5f9cf226; color: #b9d6ff; }
 /* amethyst */
 .vip-root.grp-amethyst .vip-glow { background-color: gradient( linear, 0% 0%, 100% 0%, from( #b07cf200 ), color-stop( 0.3, #b07cf2 ), color-stop( 0.5, #ddc4ff ), color-stop( 0.7, #b07cf2 ), to( #b07cf200 ) ); }
 .vip-root.grp-amethyst .vip-head { background-color: gradient( linear, 0% 0%, 100% 0%, from( #b07cf214 ), to( #b07cf200 ) ); }
@@ -247,3 +280,6 @@
 .vip-root.grp-amethyst .vp.sel .vp-t { color: #ddc4ff; }
 .vip-root.grp-amethyst .vl:hover { border: 1px solid #b07cf299; }
 .vip-root.grp-amethyst .vip-dot.a { background-color: #b07cf2; }
+.vip-root.grp-amethyst .vl.on .vl-sw { background-color: gradient( linear, 0% 0%, 100% 0%, from( #6a3bb0 ), to( #b07cf2 ) ); box-shadow: #b07cf266 0px 0px 10px 0px; }
+.vip-root.grp-amethyst .vl.is-cur { border: 1px solid #b07cf2; }
+.vip-root.grp-amethyst .vl-n { background-color: #b07cf226; color: #ddc4ff; }

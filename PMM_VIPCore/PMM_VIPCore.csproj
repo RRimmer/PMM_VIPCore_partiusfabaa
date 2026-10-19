@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>PMM_VIPCore</AssemblyName>
         <RootNamespace>PMM_VIPCore</RootNamespace>
-        <Version>0.1.3</Version>
+        <Version>0.1.4</Version>
         <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
