@@ -1,55 +1,154 @@
+// PMM_VIPCore — config. File: configs/plugins/PMM_VIPCore/PMM_VIPCore.json
+// JSON with comments: lines starting with // are ignored by CounterStrikeSharp.
+// Do not leave a comma after the last item of a block. Changes need a server restart.
+// JSON с комментариями: строки с // CounterStrikeSharp пропускает.
+// После последнего элемента блока запятую не ставить. После изменений — перезапуск сервера.
 {
+  // Мост включён. false — VIPCore показывает свои меню.
+  // Bridge on. false = VIPCore shows its own menus.
   "Enabled": true,
+
+  // Тип меню для всех: "" — у каждого игрока свой из !menu; иначе PanoramaMenu, PanoramaWasdMenu, ChatMenu, CenterMenu …
+  // "" = each player's own menu from !menu; or force one MenuType for everybody.
   "ForceMenuType": "",
+
+  // VIPCore 2: при каких значениях "MenuType" в configs/plugins/VIPCore/vip_core.json меню показывает мост.
+  // "center" — значение VIPCore по умолчанию. "chat" / "console" — VIPCore оставляет свои меню.
+  // VIPCore 2: "MenuType" values of vip_core.json for which the bridge shows the VIP menus. VIPCore 1 ignores it.
+  "CoreMenuTypes": [
+    "center",
+    "pmm",
+    "panorama"
+  ],
+
+  // Плагины (имена сборок), чьи обычные ChatMenu / CenterHtmlMenu переносятся в MenuManager. "VIP_*" — все модули VIP.
+  // Plugins whose plain CSS menus move to MenuManager ("*" at the end = prefix). Empty = no CSS hooks.
   "InterceptPlugins": [
     "VIPCore",
     "VIP_*"
   ],
+
+  // Toggle-функции в !vip — тумблерами, переключаются на месте.
+  // Toggle features in !vip as switches, changed in place.
   "MainToggles": true,
+  // «Банихоп: Включено» — строкой статуса в панели / тостом вместо чата (только панорама).
+  // Toggle message as a status line / toast instead of chat (panorama only).
   "ToggleNotify": true,
+
+  // Selectable-функции, чей список значений показывается прямо в !vip (плитки 4×4). Только те, чей
+  // OnSelectItem просто открывает меню (Fov, Tag). НЕ добавлять Respawn и подобные.
+  // Selectable features shown as a value picker inside !vip. Never add Respawn-like features.
   "InlineSelectFeatures": [
     "Fov",
     "Tag"
   ],
+  // Больше значений — обычная строка с подменю.
+  // More choices = a normal row with a sub menu.
   "InlineSelectMax": 16,
+
+  // «Назад» в подменю.
+  // "Back" in sub menus.
   "BackButton": true,
+  // После выбора в подменю вернуться в родительское меню.
+  // After a pick in a sub menu go back to the parent menu.
   "ReturnToParentAfterSelect": true,
+  // Кнопка выхода.
+  // Exit button.
   "ExitButton": true,
+  // Убирать цвета чата ({green}, \x04 …) из заголовков и строк (кроме ChatMenu).
+  // Strip chat colour codes (not for ChatMenu).
   "StripColors": true,
+  // Подробный лог (открытия, перехваты, распознавание меню оружия).
+  // Verbose log.
   "Debug": false,
+  // Меню модуля, где все строки недоступны, не открывается (WeaponsMenu до раунда наборов).
+  // A module menu with every row disabled is not opened.
   "SkipDisabledMenus": true,
+  // Язык текстов модулей из lang/: "" — язык игрока (VIPCore 2) / текущий язык CSS, или например "ru".
+  // Language of module texts from lang/: "" = the player's / current CSS language, or e.g. "ru".
   "ModuleLanguage": "",
+
+  // Автозакрытие с отсчётом в панели, секунды. 0 — выключено.
+  // Auto close with a countdown, seconds. 0 = off.
+  // Всплывающие меню модулей (WeaponsMenu при спавне):
+  // Module pop-up menus (WeaponsMenu on spawn):
   "AutoCloseSeconds": 20,
+  // !vip и его подменю:
+  // !vip and its sub menus:
   "AutoCloseVipSeconds": 0,
+  // Последние N секунд отсчёт красный.
+  // Countdown turns red for the last N seconds.
   "AutoCloseWarnSeconds": 5,
+
+  // Меню оружия VIP_WeaponsMenu: компактная панель, шестерёнка, настройки !swm, мышь / WASD / цифры.
+  // VIP_WeaponsMenu: compact panel, gear, !swm settings, mouse / WASD / digits.
   "WeaponsMenu": {
+    // false — меню оружия как обычное подменю модуля, без настроек.
+    // false = plain module menu, no settings.
     "Enabled": true,
+    // Команды, открывающие настройки (css_swm = !swm в чате).
+    // Commands that open the settings (css_swm = !swm).
     "Commands": [
       "css_swm"
     ],
+    // Компактная панель (440 px). false — широкая VIP-панель.
+    // Compact panel. false = the wide VIP panel.
     "Compact": true,
+    // Где компактная панель: Left / Center / Right.
+    // Compact panel position.
     "Position": "Left",
+    // Значения для игроков, которые ещё не меняли настройки:
+    // Defaults for players who never changed the settings:
+    // «Спрашивать каждый раз о сохранении набора?» Если игрок выключит — больше не спрашивается никогда.
+    // "Ask every time whether to save the set?" Off = never asked again.
     "DefaultAskSave": true,
+    // «Автоматический вызов меню выбора комплекта оружий» при спавне.
+    // "Open the weapon set menu automatically" on spawn.
     "DefaultEveryRound": true,
+    // Вид меню: Auto (по !menu игрока), Mouse, Wasd, Digits (нужен PMM Core 1.2.05 и проверка цифр).
+    // Auto (from !menu) / Mouse / Wasd / Digits.
     "DefaultMode": "Auto",
+    // Имя сборки модуля и ключ его функции в VIPCore (менять не нужно).
+    // Module assembly name and VIPCore feature key.
     "Module": "VIP_WeaponsMenu",
     "Feature": "WeaponsMenu"
   },
+
+  // Своя VIP-панорама (pmm_vip.xml, нужен аддон). Рисуется игрокам с PanoramaMenu.
+  // Own VIP panorama (needs the addon).
   "Paint": {
+    // false — обычное меню MenuManager вместо VIP-панели.
+    // false = standard MenuManager menu.
     "Enabled": true,
+    // Файл разметки в аддоне (менять, только если переименовали).
+    // Layout file in the addon.
     "LayoutPath": "panorama/layout/custom_game/pmm_vip.xml",
+    // Где панель: Left / Center / Right.
+    // Panel position.
     "Position": "Center",
+    // Задержка первой отрисовки и захвата мыши, сек (в кадре команды чата рисовать нельзя — кик).
+    // Delay of the first draw / mouse capture, s.
     "OpenDelay": 0.2,
     "InputDelay": 0.2,
+    // Сколько секунд видна строка статуса.
+    // Status line duration, s.
     "ToastSeconds": 2.5,
+    // Формат даты окончания VIP.
+    // VIP expiry date format.
     "DateFormat": "dd.MM.yyyy",
+    // Группа VIP → палитра из Theme.Palettes. Не указанная группа — палитра, чьё имя есть в названии группы, иначе DefaultPalette.
+    // VIP group → palette of Theme.Palettes.
     "GroupPalette": {
       "VIPBRONZE": "bronze",
       "VIPSILVER": "silver",
       "VIPGOLD": "gold"
     },
     "DefaultPalette": "gold",
+    // Иконка для функций без своей иконки (Icons, классы ic-* в pmm_vip.css).
+    // Icon for features without their own.
     "DefaultIcon": "star",
+    // Запасные тексты панели, если в lang/*.json нет ключа pmm_vip.*. {0} {1} — подставляемые значения.
+    // Fallback panel texts when lang/*.json has no pmm_vip.* key.
     "Texts": {
       "Brand": "VIP",
       "Forever": "навсегда",
@@ -65,16 +164,22 @@
       "Page": "{0} / {1}",
       "ClosesIn": "Закроется через {0} с"
     },
+    // Цвета панели и групп. Панорама не берёт цвета с сервера: плагин пишет pmm_vip_theme.css рядом со своей DLL
+    // (или по css_pmm_vip css); скопируй его в аддон и пересобери аддон.
+    // Panel and group colours: the plugin writes pmm_vip_theme.css, copy it into the addon and rebuild it.
     "Theme": {
+      // Панель / panel
       "PanelTop": "#19171cf5",
       "PanelBottom": "#0d0c10f5",
       "PanelBorder": "#3a2f1c",
       "Separator": "#ffffff1a",
+      // Шапка / header
       "Nick": "#ffffff",
       "Muted": "#a7a29a",
       "CloseBg": "#ffffff0d",
       "CloseHover": "#c93642",
       "CloseText": "#ffffffcc",
+      // Плитки / tiles
       "TileBg": "#ffffff08",
       "TileBorder": "#ffffff12",
       "TileHover": "#ffffff12",
@@ -82,21 +187,28 @@
       "TileDesc": "#8e897f",
       "IconBox": "#ffffff0d",
       "Icon": "#d8d4cc",
+      // Ползунок / switch
       "SwitchOff": "#ffffff1f",
       "KnobOff": "#9a958c",
       "KnobOn": "#ffffff",
+      // Кнопки и точки страниц / buttons, page dots
       "ButtonBg": "#ffffff0f",
       "ButtonHover": "#ffffff22",
       "ButtonText": "#dddddd",
       "DotOff": "#ffffff26",
+      // Строка статуса: успех / status line: ok
       "ToastOkBg": "#1f2a1b",
       "ToastOkBorder": "#6fbf5a66",
       "ToastOkText": "#d6efcd",
       "ToastOkIcon": "#8fe07a",
+      // Строка статуса: ошибка / status line: warning
       "ToastWarnBg": "#2a1b1b",
       "ToastWarnBorder": "#d9606066",
       "ToastWarnText": "#f3d0d0",
       "ToastWarnIcon": "#ff8a8a",
+      // Палитры групп: Accent — главный цвет (тумблер, бейдж, рамки), Light / Dark — оттенки, OnAccent — текст на бейдже.
+      // Можно добавить свою палитру и указать её в GroupPalette.
+      // Group palettes; add your own and use it in GroupPalette.
       "Palettes": {
         "gold": {
           "Accent": "#f2c35b",
@@ -149,5 +261,8 @@
       }
     }
   },
+
+  // Служебное, не менять.
+  // Internal, do not change.
   "ConfigVersion": 1
 }

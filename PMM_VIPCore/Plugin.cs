@@ -15,7 +15,7 @@ namespace PMM_VIPCore;
 public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
 {
     public override string ModuleName => "PMM_VIPCore";
-    public override string ModuleVersion => "0.1.4";
+    public override string ModuleVersion => "0.1.5";
     public override string ModuleAuthor => "Rimmer";
     public override string ModuleDescription => "Shows VIPCore (thesamefabius) menus through PanoramaMenuManager (Harmony bridge)";
 
@@ -27,6 +27,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
     {
         config.InterceptPlugins ??= new();
         config.InlineSelectFeatures ??= new();
+        config.CoreMenuTypes ??= new();
         config.WeaponsMenu ??= new WeaponsMenuOptions();
         config.WeaponsMenu.Commands ??= new();
         var paint = config.Paint ??= new PaintOptions();
@@ -47,7 +48,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
 
     private IMenuApi? _api;
     private Assembly? _vip;
-    private MethodInfo? _coreCreateMenu;   // VipCore.CreateMenu(CCSPlayerController), private
+    private MethodInfo? _coreMainMenu;     // !vip: VipCore.CreateMenu(player) (1.x) / Services.MenuManager.OpenVipMenu(player) (2.x)
     private readonly List<string> _patched = new();
     private MenuType? _forceType;
     private bool _harmonyReady;
@@ -61,7 +62,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         _harmonyReady = HarmonyLoader.Ensure(ModuleDirectory, Logger);
         RegisterListener<Listeners.OnClientDisconnect>(slot => _slots.Remove(slot));
         _tr = new VipTranslations(ModuleDirectory, Logger);
-        _tr.EnsureSection();
+        _tr.EnsureLangFiles();
         WriteThemeCss();
         PaintLoad();
         WmLoad();
@@ -130,6 +131,9 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
         _slots.Clear();
         _cssHooks = false;
         _mainDepth = 0;
+        _core = null;
+        _mainHost = null;
+        _coreKind = CoreKind.None;
 
         _vip = AppDomain.CurrentDomain.GetAssemblies().LastOrDefault(a => a.GetName().Name == "VIPCore");
         if (_vip == null)
@@ -138,28 +142,45 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
             return;
         }
 
-        var tCore = _vip.GetType("VIPCore.VipCore");
+        // VIPCore 1.x (thesamefabius): VIPCore.VipCore. VIPCore 2.x (partiusfabaa): VIPCore.Plugin + Services.MenuManager.
         var tApi = _vip.GetType("VIPCore.VipCoreApi");
-        if (tCore == null || tApi == null)
+        var tLegacy = _vip.GetType("VIPCore.VipCore");
+        var tV2Plugin = _vip.GetType("VIPCore.Plugin");
+        var tV2Menu = _vip.GetType("VIPCore.Services.MenuManager");
+        var p = typeof(Patches);
+        var playerArg = new[] { typeof(CCSPlayerController) };
+        var printArgs = new[] { typeof(CCSPlayerController), typeof(string) };
+        MethodInfo? print;
+        if (tApi != null && tLegacy != null)
         {
-            Logger.LogError("VIPCore classes not found (VIPCore.VipCore / VIPCore.VipCoreApi). Version changed?");
+            _coreKind = CoreKind.Legacy;
+            _coreMainMenu = tLegacy.GetMethod("CreateMenu", Any, null, playerArg, null);
+            print = tApi.GetMethod("PrintToChat", Any, null, printArgs, null);
+        }
+        else if (tApi != null && tV2Plugin != null && tV2Menu != null)
+        {
+            _coreKind = CoreKind.V2;
+            _coreMainMenu = tV2Menu.GetMethod("OpenVipMenu", Any, null, playerArg, null);
+            // VipApi.PrintToChat and the core's own chat lines (toggle "Bhop: Enabled") both end in Plugin.PrintToChat.
+            print = tV2Plugin.GetMethod("PrintToChat", Any, null, printArgs, null);
+        }
+        else
+        {
+            Logger.LogError("VIPCore classes not found (VipCore 1.x: VIPCore.VipCore, 2.x: VIPCore.Plugin / Services.MenuManager). Version changed?");
             return;
         }
 
-        var p = typeof(Patches);
-        _coreCreateMenu = tCore.GetMethod("CreateMenu", Any, null, new[] { typeof(CCSPlayerController) }, null);
-        var apiCreateMenu = tApi.GetMethod("CreateMenu", Any, null, new[] { typeof(string) }, null);
-        var apiPrint = tApi.GetMethod("PrintToChat", Any, null, new[] { typeof(CCSPlayerController), typeof(string) }, null);
-
-        // VipApi.CreateMenu(title): !vip and every module that uses CreateMenu (Fov ...) get our menu object.
-        TryPatch(apiCreateMenu, null, p.GetMethod(nameof(Patches.CreateMenuPostfix)), null);
-        // VipCore.CreateMenu(player): marks "this is the !vip main menu" while it is being built.
-        TryPatch(_coreCreateMenu, p.GetMethod(nameof(Patches.MainPrefix)), null, p.GetMethod(nameof(Patches.MainFinalizer)));
-        // VipApi.PrintToChat: "Bhop: Enabled" after a toggle -> MenuManager toast.
-        TryPatch(apiPrint, p.GetMethod(nameof(Patches.PrintPrefix)), null, null);
-        // VipApi.GetTranslatedText(name, args): module texts (weaponsmenu.*, buyteamweapon.* ...) from the translations file.
+        // VipApi.CreateMenu(title): !vip and every module that uses CreateMenu (Fov, WeaponsMenu ...) get our menu object.
+        TryPatch(tApi.GetMethod("CreateMenu", Any, null, new[] { typeof(string) }, null), null, p.GetMethod(nameof(Patches.CreateMenuPostfix)), null);
+        // The !vip method: marks "this is the !vip main menu" while it is being built.
+        TryPatch(_coreMainMenu, p.GetMethod(nameof(Patches.MainPrefix)), null, p.GetMethod(nameof(Patches.MainFinalizer)));
+        // PrintToChat: "Bhop: Enabled" after a toggle -> status line / MenuManager toast.
+        TryPatch(print, p.GetMethod(nameof(Patches.PrintPrefix)), null, null);
+        // GetTranslatedText([player,] name, args): module texts (weaponsmenu.*, buyteamweapon.* ...) from our translations.
         TryPatch(tApi.GetMethod("GetTranslatedText", Any, null, new[] { typeof(string), typeof(object[]) }, null),
             null, p.GetMethod(nameof(Patches.TextPostfix)), null);
+        TryPatch(tApi.GetMethod("GetTranslatedText", Any, null, new[] { typeof(CCSPlayerController), typeof(string), typeof(object[]) }, null),
+            null, p.GetMethod(nameof(Patches.TextPlayerPostfix)), null);
 
         if (!_patched.Contains("VipCoreApi.CreateMenu"))
         {
@@ -189,7 +210,10 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
             _cssHooks = _patched.Count > before;
         }
 
-        Logger.LogInformation("Patched VIPCore {Ver}: {List}", _vip.GetName().Version, string.Join(", ", _patched));
+        Logger.LogInformation("Patched VIPCore {Ver} ({Kind}): {List}", _vip.GetName().Version, CoreName, string.Join(", ", _patched));
+        if (_coreKind == CoreKind.V2 && Core() != null && !CoreTakeover)
+            Logger.LogInformation("VIPCore MenuType is '{Type}': VIPCore keeps its own menus (CoreMenuTypes: {List})",
+                CoreMenuType(), string.Join(", ", Config.CoreMenuTypes));
     }
 
     private void TryPatch(MethodInfo? m, MethodInfo? prefix, MethodInfo? postfix, MethodInfo? finalizer)
@@ -223,7 +247,7 @@ public partial class Plugin : BasePlugin, IPluginConfig<BridgeConfig>
             if (_api != null) Patch();
             if (Active) RegisterPainter();
         }
-        info.ReplyToCommand($"[PMM_VIP] active={Active} enabled={Config.Enabled} menuApi={_api != null} vipcore={_vip?.GetName().Version?.ToString() ?? "none"} core={(_core != null ? "seen" : "not yet")}");
+        info.ReplyToCommand($"[PMM_VIP] active={Active} enabled={Config.Enabled} menuApi={_api != null} vipcore={_vip?.GetName().Version?.ToString() ?? "none"} ({CoreName}) core={(Core() != null ? "found" : "not yet")} menuType={(_coreKind == CoreKind.V2 ? CoreMenuType() : "-")} takeover={CoreTakeover}");
         info.ReplyToCommand($"[PMM_VIP] patched: {(_patched.Count == 0 ? "-" : string.Join(", ", _patched))}");
         info.ReplyToCommand($"[PMM_VIP] css hooks={_cssHooks} intercept=[{string.Join(", ", Config.InterceptPlugins)}] inline=[{string.Join(", ", Config.InlineSelectFeatures)}]");
         info.ReplyToCommand($"[PMM_VIP] open menus: {_slots.Count(x => x.Value.Current != null)}");
@@ -291,11 +315,18 @@ internal static class Patches
         catch { return true; }
     }
 
-    // VipCoreApi.GetTranslatedText(name, args) -> text from MenuManager_Modules_Translation.json when it has the key
+    // VipCoreApi.GetTranslatedText(name, args) -> our translation when it has the key
     public static void TextPostfix(string __0, object[] __1, ref string __result)
     {
-        try { Plugin.Instance?.ModuleText(__0, __1, ref __result); }
+        try { Plugin.Instance?.ModuleText(__0, __1, ref __result, null); }
         catch (Exception e) { Plugin.Instance?.Logger.LogError(e, "module text {Key} failed", __0); }
+    }
+
+    // VIPCore 2: VipCoreApi.GetTranslatedText(player, name, args) -> our translation in the player's language
+    public static void TextPlayerPostfix(CCSPlayerController __0, string __1, object[] __2, ref string __result)
+    {
+        try { Plugin.Instance?.ModuleText(__1, __2, ref __result, __0); }
+        catch (Exception e) { Plugin.Instance?.Logger.LogError(e, "module text {Key} failed", __1); }
     }
 
     // ChatMenuInstance.Display / CenterHtmlMenuInstance.Display. false = MenuManager shows the menu instead.

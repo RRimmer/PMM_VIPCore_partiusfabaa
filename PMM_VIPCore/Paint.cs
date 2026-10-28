@@ -138,7 +138,30 @@ public partial class Plugin : IPmmMenuPainter
             return;
         }
         _registry.Add(this);
+        PaintFirst();
         Logger.LogInformation("VIP panorama registered ({Layout})", Config.Paint.LayoutPath);
+    }
+
+    // MenuManager asks the painters in the order they registered, and the first "yes" wins. Other painters pick
+    // menus by title (PanoramaMenuManager_WeaponPaints takes every title with "Меню оружия", so our
+    // "Настройки меню оружия" landed on the skins panel). Our painter only says yes to menus the bridge built,
+    // so it goes to the front of the list: nobody else's menu is taken by it.
+    private void PaintFirst()
+    {
+        try
+        {
+            var list = _registry?.GetType().Assembly.GetType("MenuManagerCore.PaintRegistry")
+                ?.GetField("Painters", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                ?.GetValue(null) as System.Collections.IList;
+            if (list == null || !list.Contains(this) || list.IndexOf(this) == 0) return;
+            list.Remove(this);
+            list.Insert(0, this);
+            if (Config.Debug) Logger.LogInformation("VIP panorama moved to the front of pmm:paint ({Count} painters)", list.Count);
+        }
+        catch (Exception e)
+        {
+            Logger.LogWarning("Could not move the VIP panorama to the front of pmm:paint: {Msg}", e.Message);
+        }
     }
 
     private void UnregisterPainter()
@@ -310,12 +333,6 @@ public partial class Plugin : IPmmMenuPainter
     private static bool StillShowing(PaintSlot ps, PaintView view, CCSPlayerController player)
         => player.IsValid && ps.Open && ReferenceEquals(ps.View, view);
 
-    private string ReadState(CCSPlayerController p, string key)
-    {
-        var user = (Get(_core, "Users") as IDictionary)?[p.SteamID];
-        return (Get(user, "FeatureState") as IDictionary)?[key]?.ToString() ?? "";
-    }
-
     // ---------------- drawing ----------------
 
     private void Draw(CCSPlayerController player)
@@ -392,9 +409,8 @@ public partial class Plugin : IPmmMenuPainter
 
     private void DrawHeader(CCSPlayerController player)
     {
-        var user = (Get(_core, "Users") as IDictionary)?[player.SteamID];
-        string group = Get(user, "group") as string ?? "";
-        long expires = Get(user, "expires") switch { int i => i, long l => l, _ => 0 };
+        string group = UserGroup(player);
+        long expires = UserExpires(player);
 
         Var(player, RootId, "vip_brand", T(player, "brand", Tx.Brand));
         Var(player, RootId, "vip_nick", player.PlayerName ?? "");

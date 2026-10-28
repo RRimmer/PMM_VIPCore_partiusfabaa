@@ -46,9 +46,13 @@ public class BridgeConfig : BasePluginConfig
     // (e.g. all weapon sets are "from round 3" and it is round 1).
     [JsonPropertyName("SkipDisabledMenus")] public bool SkipDisabledMenus { get; set; } = true;
 
-    // Language of module texts (GetTranslatedText) from MenuManager_Modules_Translation.json:
-    // "" = the language CSS is using at that moment (player's for commands, server's in timers), or e.g. "ru".
+    // Language of module texts (GetTranslatedText) from lang/<language>.json:
+    // "" = the player's language (VIPCore 2) / the language CSS is using at that moment, or e.g. "ru".
     [JsonPropertyName("ModuleLanguage")] public string ModuleLanguage { get; set; } = "";
+    // VIPCore 2.x: values of "MenuType" in vip_core.json for which the bridge shows VIPCore menus through MenuManager.
+    // "center" is VIPCore's default. With another value (chat / console) VIPCore keeps its own menus.
+    // VIPCore 1.x has no MenuType: the bridge always works.
+    [JsonPropertyName("CoreMenuTypes")] public List<string> CoreMenuTypes { get; set; } = new() { "center", "pmm", "panorama" };
 
     // Auto close with a countdown in the panel. 0 = off.
     // Module menus that pop up by themselves (WeaponsMenu on spawn ...):

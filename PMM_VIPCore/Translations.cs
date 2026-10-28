@@ -9,32 +9,42 @@ using Microsoft.Extensions.Logging;
 
 namespace PMM_VIPCore;
 
-// Texts of the VIP menus from MenuManager's file
-// configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json (plugin -> language -> key -> text).
-// The bridge adds its own "PMM_VIPCore" section once; after that the file belongs to the admin.
+// Texts of the VIP menus.
+//  1. plugins/PMM_VIPCore/lang/<language>.json (ru.json, en.json ...: key -> text). The plugin creates them and adds
+//     the keys a new version brings; keys that are already there are never changed (the admin's texts stay).
+//  2. configs/plugins/MenuManagerCore/MenuManager_Modules_Translation.json, read only: the "PMM_VIPCore" section
+//     of older versions and other modules' sections (feature names of third-party VIP modules).
 // Lookup: whole text first (feature key "Health", "tag.Disable", "pmm_vip.back"), then tokens with . or _
 // inside a longer text, the same way MenuManager does it for its own menus.
 internal sealed class VipTranslations
 {
     public const string Section = "PMM_VIPCore";
-    private const string FileName = "MenuManager_Modules_Translation.json";
+    private const string MenuManagerFile = "MenuManager_Modules_Translation.json";
 
     private static readonly Regex Token = new(
         @"(?<![A-Za-z0-9_.])([A-Za-z][A-Za-z0-9_.]*[_.][A-Za-z0-9_.]*)(?![A-Za-z0-9_.])",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    private static readonly JsonDocumentOptions ReadOptions = new()
+    {
+        CommentHandling = JsonCommentHandling.Skip,
+        AllowTrailingCommas = true,
+    };
+
     private readonly ILogger _log;
-    private readonly string _path;
-    private DateTime _writtenAt = DateTime.MinValue;
+    private readonly string _langDir;
+    private readonly string _mmPath;
+    private string _stamp = "";
     private Dictionary<string, Dictionary<string, string>> _byLanguage = new(StringComparer.OrdinalIgnoreCase);
 
     public VipTranslations(string moduleDirectory, ILogger log)
     {
         _log = log;
-        _path = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "MenuManagerCore", FileName));
+        _langDir = Path.Combine(moduleDirectory, "lang");
+        _mmPath = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "MenuManagerCore", MenuManagerFile));
     }
 
-    public string FilePath => _path;
+    public string FilePath => _langDir;
     public int Languages
     {
         get
@@ -44,109 +54,136 @@ internal sealed class VipTranslations
         }
     }
 
-    // Adds the PMM_VIPCore section, or the keys / languages it is missing (a new version brings new keys).
-    // Keys that are already there are never changed: the admin's texts stay. Other sections stay as they are.
-    public void EnsureSection()
+    // Creates lang/<language>.json or adds the keys it is missing.
+    public void EnsureLangFiles()
     {
-        try
-        {
-            JsonObject root;
-            if (File.Exists(_path))
-            {
-                var parsed = JsonNode.Parse(File.ReadAllText(_path), documentOptions: new JsonDocumentOptions
-                {
-                    CommentHandling = JsonCommentHandling.Skip,
-                    AllowTrailingCommas = true,
-                });
-                if (parsed is not JsonObject obj)
-                {
-                    _log.LogWarning("Translations: {Path} is not a JSON object, section not added", _path);
-                    return;
-                }
-                root = obj;
-            }
-            else
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-                root = new JsonObject();
-            }
-
-            bool created = root[Section] is not JsonObject;
-            if (created) root[Section] = new JsonObject();
-            var section = (JsonObject)root[Section]!;
-            int added = 0;
-            foreach (var (lang, map) in VipDefaults.Texts)
-            {
-                if (section[lang] is not JsonObject o)
-                {
-                    o = new JsonObject();
-                    section[lang] = o;
-                }
-                foreach (var (k, v) in map)
-                {
-                    if (o.ContainsKey(k)) continue;
-                    o[k] = v;
-                    added++;
-                }
-            }
-            if (added == 0) return;
-
-            File.WriteAllText(_path, root.ToJsonString(new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            }));
-            _log.LogInformation("Translations: {Count} keys {What} section {Section} of {Path}",
-                added, created ? "written to the new" : "added to the", Section, _path);
-        }
+        try { Directory.CreateDirectory(_langDir); }
         catch (Exception e)
         {
-            _log.LogWarning(e, "Translations: could not add the {Section} section to {Path}", Section, _path);
+            _log.LogWarning(e, "Translations: could not create {Dir}", _langDir);
+            return;
+        }
+
+        foreach (var (lang, map) in VipDefaults.Texts)
+        {
+            string path = Path.Combine(_langDir, lang + ".json");
+            try
+            {
+                JsonObject root;
+                bool created = !File.Exists(path);
+                if (created) root = new JsonObject();
+                else if (JsonNode.Parse(File.ReadAllText(path), documentOptions: ReadOptions) is JsonObject obj) root = obj;
+                else
+                {
+                    _log.LogWarning("Translations: {Path} is not a JSON object, keys not added", path);
+                    continue;
+                }
+
+                int added = 0;
+                foreach (var (k, v) in map)
+                {
+                    if (root.ContainsKey(k)) continue;
+                    root[k] = v;
+                    added++;
+                }
+                if (added == 0) continue;
+
+                File.WriteAllText(path, root.ToJsonString(new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                }));
+                _log.LogInformation("Translations: {Count} keys {What} {Path}", added, created ? "written to the new" : "added to", path);
+            }
+            catch (Exception e)
+            {
+                _log.LogWarning(e, "Translations: could not update {Path}", path);
+            }
         }
     }
 
+    private IEnumerable<string> LangFiles()
+    {
+        try { return Directory.Exists(_langDir) ? Directory.GetFiles(_langDir, "*.json") : Array.Empty<string>(); }
+        catch { return Array.Empty<string>(); }
+    }
+
+    private DateTime _checkedAt = DateTime.MinValue;
+
+    // Files are looked at no more than once a second (texts are read many times per menu).
     private void ReloadIfChanged()
     {
-        if (!File.Exists(_path)) return;
-        DateTime written = File.GetLastWriteTimeUtc(_path);
-        if (written == _writtenAt) return;
-        _writtenAt = written;
+        var now = DateTime.UtcNow;
+        if (_stamp != "" && (now - _checkedAt).TotalSeconds < 1) return;
+        _checkedAt = now;
+        var files = LangFiles().OrderBy(f => f, StringComparer.OrdinalIgnoreCase).ToList();
+        string stamp = string.Join("|", files.Append(_mmPath).Select(f =>
+            File.Exists(f) ? f + ":" + File.GetLastWriteTimeUtc(f).Ticks : f + ":-"));
+        if (stamp == _stamp) return;
+        _stamp = stamp;
 
         var next = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
-        try
+        Dictionary<string, string> Map(string lang)
         {
-            using var doc = JsonDocument.Parse(File.ReadAllText(_path), new JsonDocumentOptions
-            {
-                CommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true,
-            });
-            if (doc.RootElement.ValueKind != JsonValueKind.Object) return;
+            if (!next.TryGetValue(lang, out var map))
+                next[lang] = map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            return map;
+        }
 
-            // Our own section first: a key that another plugin's section also has must not override VIP texts.
-            var modules = doc.RootElement.EnumerateObject()
-                .OrderBy(m => m.Name.Equals(Section, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
-            foreach (var module in modules)
+        // 1. lang/<language>.json
+        foreach (var file in files)
+        {
+            try
             {
-                if (module.Value.ValueKind != JsonValueKind.Object) continue;
-                foreach (var language in module.Value.EnumerateObject())
+                using var doc = JsonDocument.Parse(File.ReadAllText(file), ReadOptions);
+                if (doc.RootElement.ValueKind != JsonValueKind.Object) continue;
+                var map = Map(Path.GetFileNameWithoutExtension(file));
+                foreach (var phrase in doc.RootElement.EnumerateObject())
                 {
-                    if (language.Value.ValueKind != JsonValueKind.Object) continue;
-                    if (!next.TryGetValue(language.Name, out var map))
-                        next[language.Name] = map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var phrase in language.Value.EnumerateObject())
+                    if (phrase.Value.ValueKind != JsonValueKind.String) continue;
+                    string? value = phrase.Value.GetString();
+                    if (!string.IsNullOrEmpty(value)) map[phrase.Name] = value;
+                }
+            }
+            catch (Exception e)
+            {
+                _log.LogWarning(e, "Translations: could not read {Path}", file);
+            }
+        }
+
+        // 2. MenuManager's file: our old section first, then the other modules. A key already known is not replaced.
+        if (File.Exists(_mmPath))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(File.ReadAllText(_mmPath), ReadOptions);
+                if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                {
+                    var modules = doc.RootElement.EnumerateObject()
+                        .OrderBy(m => m.Name.Equals(Section, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
+                    foreach (var module in modules)
                     {
-                        if (phrase.Value.ValueKind != JsonValueKind.String) continue;
-                        string? value = phrase.Value.GetString();
-                        if (!string.IsNullOrEmpty(value)) map.TryAdd(phrase.Name, value);
+                        if (module.Value.ValueKind != JsonValueKind.Object) continue;
+                        foreach (var language in module.Value.EnumerateObject())
+                        {
+                            if (language.Value.ValueKind != JsonValueKind.Object) continue;
+                            var map = Map(language.Name);
+                            foreach (var phrase in language.Value.EnumerateObject())
+                            {
+                                if (phrase.Value.ValueKind != JsonValueKind.String) continue;
+                                string? value = phrase.Value.GetString();
+                                if (!string.IsNullOrEmpty(value)) map.TryAdd(phrase.Name, value);
+                            }
+                        }
                     }
                 }
             }
-            _byLanguage = next;
+            catch (Exception e)
+            {
+                _log.LogWarning(e, "Translations: could not read {Path}", _mmPath);
+            }
         }
-        catch (Exception e)
-        {
-            _log.LogWarning(e, "Translations: could not read {Path}", _path);
-        }
+        _byLanguage = next;
     }
 
     public static CultureInfo Culture(CCSPlayerController? player)
@@ -187,7 +224,7 @@ internal sealed class VipTranslations
     }
 }
 
-// What the PMM_VIPCore section starts with. Feature keys = VIPCore feature names (vip.json),
+// Default texts: written into lang/<language>.json. Feature keys = VIPCore feature names (vip.json),
 // pmm_vip.* = texts of the VIP panel, pmm_vip.value.<Feature> = format of the vip.json value ({0}).
 internal static class VipDefaults
 {

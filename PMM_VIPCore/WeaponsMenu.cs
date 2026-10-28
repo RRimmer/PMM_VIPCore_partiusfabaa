@@ -47,7 +47,6 @@ public partial class Plugin
 
     private sealed class WmState
     {
-        public bool Asked;              // the "save this set?" prompt was shown on this map
         public bool Hinted;             // chat hint about !swm was printed on this map
         public bool Manual;             // "Pick a set now" is running: show the list although EveryRound is off
         public bool Checking;           // number keys check of MenuManager is open
@@ -73,7 +72,6 @@ public partial class Plugin
         {
             foreach (var w in _wm.Values)
             {
-                w.Asked = false;
                 w.Hinted = false;
                 w.Yes = null;
                 w.LastPick = "";
@@ -138,13 +136,13 @@ public partial class Plugin
                 // Kept for "Save set «X»" in the settings, also when the prompt is not shown.
                 ws.Yes = src.MenuOptions.FirstOrDefault();
                 ws.PendingName = RoundPrefix.Replace(ws.LastPick, "").Trim();
-                if (!prefs.AskSave && ws.Asked)
+                // "Ask every time" off: never asked again (the setting is saved per SteamID, also over map changes
+                // and restarts); the set is saved with "Save set «X»" in the settings.
+                if (!prefs.AskSave)
                 {
-                    if (Config.Debug) Logger.LogInformation("[{Slot}] WeaponsMenu save prompt skipped (asked on this map)", player.Slot);
-                    WmHint(player, ws);
+                    if (Config.Debug) Logger.LogInformation("[{Slot}] WeaponsMenu save prompt skipped (AskSave off)", player.Slot);
                     return false;
                 }
-                ws.Asked = true;
                 return true;
         }
         return true;
@@ -388,49 +386,9 @@ public partial class Plugin
 
     // ---------------- module access (reflection) ----------------
 
-    private object? WmCore()
-    {
-        if (_core != null) return _core;
-        // vipcore:core is registered as PluginCapability<IVipCoreApi> (providers are per generic type),
-        // so the capability is built for VIPCore's own IVipCoreApi type.
-        try
-        {
-            var iapi = _vip?.GetType("VIPCore.VipCoreApi")?.GetInterfaces().FirstOrDefault(i => i.Name == "IVipCoreApi");
-            if (iapi == null) return null;
-            var cap = Activator.CreateInstance(typeof(PluginCapability<>).MakeGenericType(iapi), "vipcore:core");
-            var api = cap?.GetType().GetMethod("Get")?.Invoke(cap, null);
-            _core = Get(api, "_vipCore");
-        }
-        catch (Exception e)
-        {
-            if (Config.Debug) Logger.LogInformation("vipcore:core not available: {Msg}", e.Message);
-        }
-        return _core;
-    }
+    private object? WmFeature() => FeatureObject(Wmo.Feature);
 
-    private object? WmFeature()
-    {
-        var f = (Get(WmCore(), "Features") as IDictionary)?[Wmo.Feature];
-        return (Get(f, "OnSelectItem") as Delegate)?.Target;
-    }
-
-    private bool WmHasAccess(CCSPlayerController p)
-    {
-        var api = Get(WmCore(), "VipApi");
-        if (api == null) return false;
-        try
-        {
-            var isVip = api.GetType().GetMethod("IsClientVip", Any, null, new[] { typeof(CCSPlayerController) }, null);
-            var has = api.GetType().GetMethod("PlayerHasFeature", Any, null, new[] { typeof(CCSPlayerController), typeof(string) }, null);
-            if (isVip != null && isVip.Invoke(api, new object[] { p }) is false) return false;
-            return has == null || has.Invoke(api, new object[] { p, Wmo.Feature }) is true;
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(e, "VIP access check failed");
-            return false;
-        }
-    }
+    private bool WmHasAccess(CCSPlayerController p) => CoreHasFeature(p, Wmo.Feature);
 
     private bool WmHasSaved(CCSPlayerController p)
     {

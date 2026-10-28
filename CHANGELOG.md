@@ -4,6 +4,22 @@
 
 ## English
 
+### 0.1.5 — 2026-10-28
+- VIPCore 2.x (partiusfabaa, 2.0.0) support. The bridge finds out which VIPCore is installed (2.x or the older 1.x)
+  and hooks `Services.MenuManager.OpenVipMenu`, `VipCoreApi.CreateMenu`, `Plugin.PrintToChat` and both
+  `GetTranslatedText` of VIPCore 2. Features, states, group values (with `$inherit`) and the VIP expiry come from
+  its `PlayersManager` / `FeatureManager`; toggles go through VIPCore's own handler (use check, cookie, module callback).
+- VIPCore 2 `MenuType` (`vip_core.json`): with `center` (default) the VIP menus are PMM_VIPCore menus, with `chat` /
+  `console` VIPCore keeps its own. New config key `CoreMenuTypes` (default `center`, `pmm`, `panorama`).
+- WeaponsMenu: "Ask every time whether to save the set?" is on by default; once a player turns it off the question is
+  never asked again, also after a map change or a server restart (before: once per map).
+- Translations moved to `plugins/PMM_VIPCore/lang/ru.json` and `en.json` (missing keys are added on start). The old
+  `PMM_VIPCore` section of `MenuManager_Modules_Translation.json` is still read but no longer filled in.
+- `css_pmm_vip` shows the VIPCore generation, `menuType` and `takeover`.
+- Fixed: `!swm` with Russian texts opened on the WeaponPaints skins panel — PanoramaMenuManager_WeaponPaints takes every menu whose title has "Меню оружия" ("Настройки меню оружия"). The VIP panorama now asks first on `pmm:paint` (it only takes menus built by the bridge).
+- Built against CounterStrikeSharp.API 1.0.378 (MenuManagerApi needs ≥ 1.0.377).
+- `PMM_VIPCore.json` in the archive has comments (`//`, RU + EN) for every key; the source is `PMM_VIPCore.example.jsonc`.
+
 ### 0.1.4 — 2026-10-19
 - WeaponsMenu (VIP_WeaponsMenu) in a compact panel, also when the module builds its menu with `VipApi.CreateMenu` (VIPCore 1.4.x) (440 px, 6 rows, `WeaponsMenu.Position`, left by default) with a gear ⚙
   in the header. The gear and **`!swm`** open the player's settings:
@@ -14,6 +30,7 @@
     number keys check of MenuManager on the first pick). Key hints under the rows.
 - Settings are kept per SteamID in `plugins/PMM_VIPCore/weaponsmenu_players.json`. New config section `WeaponsMenu`.
 - Panel rows can show a switch and a value; new texts `pmm_vip.wm.*`, `pmm_vip.keys_*` (added automatically).
+- Fixed: texts with colour tags showed a literal `{0}` ("BunnyHop will be active in {0} s"): only `{0}`, `{1:F1}` … are filled in now.
 - `css_pmm_vip` shows the WeaponsMenu state. The addon needs the new `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
 
 ### 0.1.3 — 2026-10-11
@@ -68,6 +85,22 @@
 
 ## Русский
 
+### 0.1.5 — 2026-10-28
+- Поддержка VIPCore 2.x (partiusfabaa, 2.0.0). Мост сам определяет, какой VIPCore стоит (2.x или старый 1.x),
+  и цепляет у VIPCore 2 `Services.MenuManager.OpenVipMenu`, `VipCoreApi.CreateMenu`, `Plugin.PrintToChat` и оба
+  `GetTranslatedText`. Функции, состояния, значения группы (с `$inherit`) и срок VIP берутся из его `PlayersManager` /
+  `FeatureManager`; тумблеры переключаются через обработчик самого VIPCore (проверка, cookie, вызов модуля).
+- `MenuType` VIPCore 2 (`vip_core.json`): при `center` (по умолчанию) VIP-меню показываются как меню PMM_VIPCore, при
+  `chat` / `console` VIPCore оставляет свои. Новый ключ конфига `CoreMenuTypes` (по умолчанию `center`, `pmm`, `panorama`).
+- WeaponsMenu: «Спрашивать каждый раз о сохранении набора?» по умолчанию включено; если игрок выключил — вопрос больше
+  не задаётся никогда, в том числе после смены карты и перезапуска сервера (раньше — раз за карту).
+- Переводы перенесены в `plugins/PMM_VIPCore/lang/ru.json` и `en.json` (недостающие ключи дописываются при запуске).
+  Старый раздел `PMM_VIPCore` в `MenuManager_Modules_Translation.json` ещё читается, но больше не дополняется.
+- `css_pmm_vip` показывает поколение VIPCore, `menuType` и `takeover`.
+- Исправлено: `!swm` с русскими текстами открывался на панели скинов WeaponPaints — PanoramaMenuManager_WeaponPaints забирает любое меню, в заголовке которого есть «Меню оружия» («Настройки меню оружия»). VIP-панорама теперь первой в `pmm:paint` (она берёт только меню, построенные мостом).
+- Сборка под CounterStrikeSharp.API 1.0.378 (MenuManagerApi требует ≥ 1.0.377).
+- `PMM_VIPCore.json` в архиве с комментариями (`//`, RU + EN) к каждому ключу; исходник — `PMM_VIPCore.example.jsonc`.
+
 ### 0.1.4 — 2026-10-19
 - WeaponsMenu (VIP_WeaponsMenu) в компактной панели, в том числе когда модуль строит меню через `VipApi.CreateMenu` (VIPCore 1.4.x) (440 px, 6 строк, `WeaponsMenu.Position`, по умолчанию слева) с шестерёнкой ⚙
   в шапке. Шестерёнка и **`!swm`** открывают настройки игрока:
@@ -78,6 +111,7 @@
     при первом выборе — проверка цифр MenuManager). Подсказка по клавишам под строками.
 - Настройки хранятся по SteamID в `plugins/PMM_VIPCore/weaponsmenu_players.json`. Новая секция конфига `WeaponsMenu`.
 - Строки панели умеют показывать тумблер и значение; новые тексты `pmm_vip.wm.*`, `pmm_vip.keys_*` (добавляются сами).
+- Исправлено: в текстах с цветами оставался `{0}` («Банихоп будет активен через {0} сек.»): теперь подставляются только `{0}`, `{1:F1}` ….
 - `css_pmm_vip` показывает состояние WeaponsMenu. В аддон нужны новые `pmm_vip.xml`, `pmm_vip.css`, `pmm_vip_theme.css`.
 
 ### 0.1.3 — 2026-10-11

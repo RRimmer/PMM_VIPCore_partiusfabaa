@@ -64,8 +64,7 @@ public partial class Plugin
         public DateTime CloseAt;                        // auto close; default = off
     }
 
-    private object? _core;       // VIPCore.VipCore instance
-    private int _mainDepth;      // > 0 while VipCore.CreateMenu(player) runs
+    private int _mainDepth;      // > 0 while VIPCore builds !vip (VipCore.CreateMenu / Services.MenuManager.OpenVipMenu)
     private int _inPmmOpen;      // > 0 while MenuManager opens our menu (it may open CSS menus itself)
     private readonly Dictionary<int, SlotState> _slots = new();
 
@@ -79,14 +78,16 @@ public partial class Plugin
     internal void OnCreateMenu(object vipApi, string title, ref IMenu result)
     {
         if (!Active) return;
-        _core ??= Get(vipApi, "_vipCore");
+        SeeApi(vipApi);
+        if (!CoreTakeover) return;   // VIPCore 2 MenuType chat / console: VIPCore keeps its own menus
         // The patched CreateMenu may show up as a VIPCore frame: the module that called it is the owner.
         result = new VipMenu(title) { Owner = CallerAssembly("VIPCore") };
     }
 
-    internal void EnterMain(object core)
+    internal void EnterMain(object host)
     {
-        _core = core;
+        _mainHost = host;
+        if (_coreKind == CoreKind.Legacy) _core = host;
         _mainDepth++;
     }
 
@@ -98,7 +99,7 @@ public partial class Plugin
     // A plain CSS menu is about to open. true = MenuManager shows it instead.
     internal bool TryIntercept(CCSPlayerController? player, IMenu menu, BasePlugin? plugin)
     {
-        if (!Active || _inPmmOpen > 0 || menu is VipMenu) return false;
+        if (!Active || _inPmmOpen > 0 || menu is VipMenu || !CoreTakeover) return false;
         if (player == null || !player.IsValid) return false;
 
         var st = State(player.Slot);
@@ -120,7 +121,7 @@ public partial class Plugin
     // Drop it from CSS and show the menu through MenuManager. true = CSS must not draw it.
     internal bool TryInterceptInstance(object instance)
     {
-        if (!Active || _inPmmOpen > 0) return false;
+        if (!Active || _inPmmOpen > 0 || !CoreTakeover) return false;
         if (Get(instance, "Menu") is not IMenu menu || Get(instance, "Player") is not CCSPlayerController player || !player.IsValid)
             return false;
         if (menu is VipMenu) return false;
@@ -147,20 +148,21 @@ public partial class Plugin
     }
 
     // Module texts (GetTranslatedText): the translations file wins when it has the key.
-    internal void ModuleText(string? name, object[]? args, ref string result)
+    internal void ModuleText(string? name, object[]? args, ref string result, CCSPlayerController? player)
     {
         if (!Active || string.IsNullOrEmpty(name)) return;
-        try { ModuleTextCore(name, args, ref result); }
+        try { ModuleTextCore(name, args, ref result, player); }
         finally { RememberTextKey(result, name); }   // menu title -> key (WeaponsMenu menus are recognised by it)
     }
 
-    private void ModuleTextCore(string name, object[]? args, ref string result)
+    private void ModuleTextCore(string name, object[]? args, ref string result, CCSPlayerController? player)
     {
         if (_tr == null) return;
         System.Globalization.CultureInfo culture;
         try
         {
-            culture = Config.ModuleLanguage != ""
+            culture = Config.ModuleLanguage == "" && player != null && player.IsValid ? VipTranslations.Culture(player)
+                : Config.ModuleLanguage != ""
                 ? System.Globalization.CultureInfo.GetCultureInfo(Config.ModuleLanguage)
                 : System.Globalization.CultureInfo.CurrentUICulture;
         }
@@ -190,8 +192,8 @@ public partial class Plugin
         string body = c > 0 ? text[(c + 1)..].Trim() : text;
 
         var notice = MenuNotice.Success;
-        if (_core is BasePlugin core &&
-            (body.Equals(Clean(core.Localizer["chat.Disabled"].Value, true), StringComparison.OrdinalIgnoreCase) ||
+        if (Core() != null &&
+            (body.Equals(Clean(CoreText(player, "chat.Disabled"), true), StringComparison.OrdinalIgnoreCase) ||
              body.Equals(_tr?.Get(VipTranslations.Culture(player), "pmm_vip.disabled") ?? Config.Paint.Texts.Disabled, StringComparison.OrdinalIgnoreCase)))
             notice = MenuNotice.Warning;
 
@@ -287,7 +289,7 @@ public partial class Plugin
         string title = Tr(CleanTitle(src.Title ?? "", strip));
         if (sh.IsMain && TrKey("pmm_vip.title") is { } mainTitle)
         {
-            string group = Get((Get(_core, "Users") as IDictionary)?[player.SteamID], "group") as string ?? "";
+            string group = UserGroup(player);
             try { title = string.Format(mainTitle, group); } catch (FormatException) { title = mainTitle; }
         }
         Action<CCSPlayerController>? back = Config.BackButton && sh.Parent is { } parent ? p => Reopen(p, parent) : null;
@@ -362,19 +364,18 @@ public partial class Plugin
     private List<Entry>? BuildMain(CCSPlayerController player, Shown sh, List<ChatMenuOption> options,
         bool strip, bool panorama)
     {
-        if (_core is not BasePlugin core) return null;
-        if (Get(core, "Features") is not IDictionary features || Get(core, "Users") is not IDictionary users) return null;
-        var user = users[player.SteamID];
-        var states = Get(user, "FeatureState") as IDictionary;
-        var values = GroupValues(core, Get(user, "group") as string);
+        if (Core() == null || CoreUser(player) == null) return null;
+        var features = CoreFeatures();
+        if (features.Count == 0) return null;
+        var states = UserStates(player);
 
-        // VIPCore row text = Localizer[key] (+ " [state]" for toggles). Longest names first.
-        var keys = new List<(string Key, string Raw)>();
-        foreach (var k in features.Keys)
+        // VIPCore row text = feature name in the player's language (+ " [state]" for toggles, V2: + display text).
+        // Longest names first.
+        var keys = new List<(string Key, string Raw, object Feature, string Type)>();
+        foreach (var (key, feature, type) in features)
         {
-            if (k is not string key) continue;
-            string raw = core.Localizer[key].Value;
-            if (!string.IsNullOrEmpty(raw)) keys.Add((key, raw));
+            string raw = CoreText(player, key);
+            if (!string.IsNullOrEmpty(raw)) keys.Add((key, raw, feature, type));
         }
         keys.Sort((a, b) => b.Raw.Length.CompareTo(a.Raw.Length));
 
@@ -382,19 +383,19 @@ public partial class Plugin
         foreach (var o in options)
         {
             string text = o.Text ?? "";
-            var hit = keys.FirstOrDefault(x => text == x.Raw || text.StartsWith(x.Raw + " [", StringComparison.Ordinal));
+            var hit = keys.FirstOrDefault(x => text == x.Raw || text.StartsWith(x.Raw + " ", StringComparison.Ordinal));
             if (hit.Key == null)
             {
                 list.Add(PlainEntry(sh, o, strip, Kind.Action));
                 continue;
             }
 
-            object? feature = features[hit.Key];
-            string ftype = Get(feature, "FeatureType")?.ToString() ?? "";
-            object? state = states?[hit.Key];
+            object? feature = hit.Feature;
+            string ftype = hit.Type;
+            object? state = states != null && states.Contains(hit.Key) ? states[hit.Key] : null;
             string label = TrKey(hit.Key) ?? Tr(Clean(hit.Raw, strip));
             string key = hit.Key;
-            string desc = FormatValue(key, values?[key]);
+            string desc = FormatValue(key, UserValue(player, key));
 
             if (ftype == "Toggle")
             {
@@ -452,15 +453,6 @@ public partial class Plugin
         return list;
     }
 
-    // vip.json values of the player's group: Config.Groups[group].Values
-    private static IDictionary? GroupValues(object core, string? group)
-    {
-        if (group == null) return null;
-        var groups = Get(Get(core, "Config"), "Groups") as IDictionary;
-        if (groups == null || !groups.Contains(group)) return null;
-        return Get(groups[group], "Values") as IDictionary;
-    }
-
     // Scalar vip.json value -> "120 HP" (Paint.ValueFormat); lists / objects / bools -> "".
     private string FormatValue(string key, object? raw)
     {
@@ -494,14 +486,13 @@ public partial class Plugin
     // Asks the module for its sub menu (OnSelectItem) without showing it.
     private IMenu? CaptureSubMenu(CCSPlayerController player, object feature, object state)
     {
-        if (Get(feature, "OnSelectItem") is not Delegate onSelect) return null;
         var st = State(player.Slot);
         var saved = st.Capture;
         var list = new List<IMenu>();
         st.Capture = list;
         try
         {
-            onSelect.DynamicInvoke(player, state);
+            InvokeSelect(player, feature, state);
         }
         catch (Exception e)
         {
@@ -526,59 +517,6 @@ public partial class Plugin
             if (FeatureAllowed(p, key, state, feature)) o.OnSelect(p, o);
             else State(p.Slot).Rebuild = true;   // refused: drop the value MenuManager already shows
         }, Kind.Select);
-    }
-
-    // Same as VIPCore's toggle row, but with the current state (VIPCore's row keeps the state it was built with).
-    private void ToggleFeature(CCSPlayerController p, string key)
-    {
-        if (_core is not BasePlugin core) return;
-        var feature = (Get(core, "Features") as IDictionary)?[key];
-        var states = Get((Get(core, "Users") as IDictionary)?[p.SteamID], "FeatureState") as IDictionary;
-        var state = states?[key];
-        if (feature == null || states == null || state == null) return;
-
-        string now = state.ToString() ?? "";
-        if (now != "Enabled" && now != "Disabled")
-        {
-            State(p.Slot).Rebuild = true;
-            return;
-        }
-        if (!FeatureAllowed(p, key, state, feature))
-        {
-            State(p.Slot).Rebuild = true;
-            return;
-        }
-
-        bool on = now == "Disabled";
-        object next = Enum.Parse(state.GetType(), on ? "Enabled" : "Disabled");
-        var culture = VipTranslations.Culture(p);
-        string name = _tr?.Get(culture, key) ?? core.Localizer[key].Value;
-        string word = _tr?.Get(culture, on ? "pmm_vip.enabled" : "pmm_vip.disabled")
-                      ?? core.Localizer[on ? "chat.Enabled" : "chat.Disabled"].Value;
-        VipPrint(p, $"{name}: {word}");
-        states[key] = next;
-        (Get(feature, "OnSelectItem") as Delegate)?.DynamicInvoke(p, next);
-
-        // Only the panorama menus flip a toggle in place; chat / center / CS:GO menus need a fresh !vip.
-        if (!IsPanorama(p)) State(p.Slot).Rebuild = true;
-    }
-
-    // VipApi.PrintToChat -> goes through PrintPrefix, so during a toggle it becomes a toast.
-    private void VipPrint(CCSPlayerController p, string message)
-    {
-        var vipApi = Get(_core, "VipApi");
-        vipApi?.GetType().GetMethod("PrintToChat", Any, null, new[] { typeof(CCSPlayerController), typeof(string) }, null)
-            ?.Invoke(vipApi, new object[] { p, message });
-    }
-
-    // VIPCore asks OnPlayerUseFeature subscribers before a feature is used; keep that for inline picks.
-    private bool FeatureAllowed(CCSPlayerController p, string key, object state, object feature)
-    {
-        var vipApi = Get(_core, "VipApi");
-        var m = vipApi?.GetType().GetMethod("PlayerUseFeature", Any);
-        if (m == null) return true;
-        var r = m.Invoke(vipApi, new object?[] { p, key, state, Get(feature, "FeatureType") });
-        return !(r is HookResult h && (h == HookResult.Handled || h == HookResult.Stop));
     }
 
     // A row was picked in MenuManager: run the original callback, then decide what stays on screen.
@@ -632,19 +570,6 @@ public partial class Plugin
         if (!p.IsValid) return;
         if (target.IsMain) ReopenMain(p);
         else Render(p, target);
-    }
-
-    private void ReopenMain(CCSPlayerController p)
-    {
-        if (_core == null || _coreCreateMenu == null || !p.IsValid) return;
-        try
-        {
-            _coreCreateMenu.Invoke(_core, new object[] { p });
-        }
-        catch (TargetInvocationException e)
-        {
-            Logger.LogError(e.InnerException ?? e, "VipCore.CreateMenu failed");
-        }
     }
 
     private void CloseFor(CCSPlayerController p)
